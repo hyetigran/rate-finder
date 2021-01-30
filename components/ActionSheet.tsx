@@ -3,14 +3,15 @@ import {
   StyleSheet,
   View,
   Text,
-  Dimensions,
   Animated,
   NativeScrollEvent,
   NativeSyntheticEvent,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
+import Layout from "../constants/Layout";
+import SearchControls from "./SearchControls";
 
-const { width, height } = Dimensions.get("screen");
+const { width, height } = Layout.window;
 
 const ActionSheet = () => {
   const [alignment] = useState(new Animated.Value(0));
@@ -43,7 +44,7 @@ const ActionSheet = () => {
         scrollEventThrottle={16}
         onScroll={(e) => gestureHandler(e)}
       ></ScrollView>
-      <Text>Hello World</Text>
+      <SearchControls />
     </Animated.View>
   );
 };
