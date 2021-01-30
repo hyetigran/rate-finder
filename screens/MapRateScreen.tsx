@@ -1,13 +1,14 @@
 import * as React from "react";
 import { StyleSheet, Dimensions } from "react-native";
 import MapView from "react-native-maps";
-
+import ActionSheet from "../components/ActionSheet";
 import { Text, View } from "../components/Themed";
 
 export default function MapRateScreen() {
   return (
     <View style={styles.container}>
       <MapView style={styles.map} />
+      <ActionSheet />
     </View>
   );
 }

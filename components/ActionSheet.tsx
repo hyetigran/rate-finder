@@ -1,16 +1,25 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Text, Dimensions, Animated } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Dimensions,
+  Animated,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+} from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
 const { width, height } = Dimensions.get("screen");
 
-const ActionSheet = (props) => {
+const ActionSheet = () => {
   const [alignment] = useState(new Animated.Value(0));
 
-  const toggleActionSheet = (value) => {
+  const toggleActionSheet = (value: number) => {
     Animated.timing(alignment, {
       toValue: value,
       duration: 500,
+      useNativeDriver: false,
     }).start();
   };
 
@@ -22,15 +31,16 @@ const ActionSheet = (props) => {
     bottom: actionSheetIntropolate,
   };
 
-  const gestureHandler = (e) => {
-    if (e.nativeEvent.contentOffset.y > 0) toggleActionSheet(0);
-    else if (e.nativeEvent.contentOffset.y < 0) toggleActionSheet(1);
+  const gestureHandler = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (e.nativeEvent.contentOffset.y > 0) toggleActionSheet(1);
+    else if (e.nativeEvent.contentOffset.y < 0) toggleActionSheet(0);
   };
 
   return (
     <Animated.View style={[styles.container, actionSheetStyle]}>
       <ScrollView
         style={styles.grabber}
+        scrollEventThrottle={16}
         onScroll={(e) => gestureHandler(e)}
       ></ScrollView>
       <Text>Hello World</Text>
@@ -48,6 +58,7 @@ const styles = StyleSheet.create({
     height: height / 2.4,
     width: width / 1.05,
     borderTopRightRadius: 40,
+    borderTopLeftRadius: 40,
     marginHorizontal: 10,
   },
   grabber: {
@@ -58,3 +69,5 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 });
+
+export default ActionSheet;
