@@ -3,6 +3,7 @@ import { StyleSheet, Dimensions } from "react-native";
 import MapView from "react-native-maps";
 import ActionSheet from "../components/ActionSheet";
 import { Text, View } from "../components/Themed";
+import { GOOGLE_API_KEY } from "react-native-dotenv";
 
 export default function MapRateScreen() {
   return (
