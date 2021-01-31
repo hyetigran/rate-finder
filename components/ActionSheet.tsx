@@ -4,14 +4,14 @@ import {
   View,
   Text,
   Animated,
+  Dimensions,
   NativeScrollEvent,
   NativeSyntheticEvent,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import Layout from "../constants/Layout";
 import SearchControls from "./SearchControls";
 
-const { width, height } = Layout.window;
+const { width, height } = Dimensions.get("screen");
 
 const ActionSheet = () => {
   const [alignment] = useState(new Animated.Value(0));
@@ -19,14 +19,14 @@ const ActionSheet = () => {
   const toggleActionSheet = (value: number) => {
     Animated.timing(alignment, {
       toValue: value,
-      duration: 500,
+      duration: 200,
       useNativeDriver: false,
     }).start();
   };
 
   const actionSheetIntropolate = alignment.interpolate({
     inputRange: [0, 1],
-    outputRange: [-height / 2.4 + 50, 0],
+    outputRange: [-height / 2.4 + 20, 0],
   });
   const actionSheetStyle = {
     bottom: actionSheetIntropolate,
@@ -56,17 +56,18 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: height / 2.4,
-    width: width / 1.05,
+    height: height / 2,
+    width: width,
     borderTopRightRadius: 40,
     borderTopLeftRadius: 40,
-    marginHorizontal: 10,
   },
   grabber: {
-    width: 60,
-    borderTopWidth: 5,
+    width: 70,
+    borderTopWidth: 6,
     borderTopColor: "#aaa",
     alignSelf: "center",
+    //paddingHorizontal: 10,
+    paddingBottom: 10,
     marginTop: 10,
   },
 });

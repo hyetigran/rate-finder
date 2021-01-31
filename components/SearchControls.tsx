@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Text, Switch } from "react-native";
-import { CheckBox } from "react-native-elements";
-import Layout from "../constants/Layout";
+import { StyleSheet, View, Text, Switch, Dimensions } from "react-native";
+import { CheckBox, ButtonGroup, Button } from "react-native-elements";
 import Colors from "../constants/Colors";
 
-const { width, height } = Layout.window;
+const { width, height } = Dimensions.get("screen");
+
 const { background, primary, text, disabled } = Colors.light;
 interface SearchForm {
   isCard: boolean;
@@ -22,7 +22,7 @@ const SearchControls = () => {
   const toggleSwitch = () => {
     setSearchForm((prevState: SearchForm) => {
       let isCard = !prevState.isCard;
-      return { ...prevState, isCard };
+      return { ...prevState, isCard, isBuy: true };
     });
   };
   const selectCurrencyHandler = (currency: string) => {
@@ -30,11 +30,26 @@ const SearchControls = () => {
       return { ...prevState, currency };
     });
   };
+
+  const actionTypeHandler = (index: number) => {
+    setSearchForm((prevState: SearchForm) => {
+      return { ...prevState, isBuy: !!!index };
+    });
+  };
+
+  const submitSearch = () => {
+    console.log("handle search");
+    // Find best rate
+
+    // Call google places API for location
+
+    // Use response to display markers on map
+  };
   return (
     <View style={styles.container}>
-      <Text>Transaction Type:</Text>
+      <Text style={styles.title}>Choose Transaction Type</Text>
       <View style={styles.switchContainer}>
-        <Text>{searchForm.isCard ? "Card" : "Cash"}</Text>
+        <Text style={styles.text}>{searchForm.isCard ? "Card" : "Cash"}</Text>
         <Switch
           trackColor={{ false: disabled, true: primary }}
           thumbColor={background}
@@ -43,20 +58,29 @@ const SearchControls = () => {
           value={searchForm.isCard}
         ></Switch>
       </View>
-      <View>
+      <ButtonGroup
+        buttons={["Buy", "Sell"]}
+        disabled={searchForm.isCard ? [1] : false}
+        selectedIndex={searchForm.isBuy ? 0 : 1}
+        onPress={actionTypeHandler}
+      ></ButtonGroup>
+      <View style={styles.checkboxContainer}>
         {["USD", "EUR", "RUB", "GBP"].map((currency) => {
           return (
             <CheckBox
               center
+              key={currency}
               title={currency}
               checkedIcon="dot-circle-o"
               uncheckedIcon="circle-o"
               checked={searchForm.currency === currency}
               onPress={() => selectCurrencyHandler(currency)}
+              containerStyle={styles.checkbox}
             />
           );
         })}
       </View>
+      <Button onPress={submitSearch} title="Search" raised />
     </View>
   );
 };
@@ -64,21 +88,35 @@ const SearchControls = () => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#fff",
-    marginVertical: 40,
-    marginHorizontal: 10,
-    justifyContent: "center",
+    //marginTop: 10,
+    marginHorizontal: 5,
+    justifyContent: "space-around",
     alignSelf: "center",
+    height: "90%",
   },
   switchContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
   },
-  grabber: {
-    width: 60,
-    borderTopWidth: 5,
-    borderTopColor: "#aaa",
-    alignSelf: "center",
-    marginTop: 10,
+  text: {
+    fontSize: 20,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    maxWidth: width * 0.7,
+    justifyContent: "center",
+  },
+  checkbox: {
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    margin: 1,
+    padding: 2,
   },
 });
 
