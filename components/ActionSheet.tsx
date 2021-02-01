@@ -12,8 +12,10 @@ import { ScrollView } from "react-native-gesture-handler";
 import SearchControls from "./SearchControls";
 
 const { width, height } = Dimensions.get("screen");
-
-const ActionSheet = () => {
+interface ActionProps {
+  getMarkers: (data: any) => void;
+}
+const ActionSheet = ({ getMarkers }: ActionProps) => {
   const [alignment] = useState(new Animated.Value(0));
 
   const toggleActionSheet = (value: number) => {
@@ -44,7 +46,7 @@ const ActionSheet = () => {
         scrollEventThrottle={16}
         onScroll={(e) => gestureHandler(e)}
       ></ScrollView>
-      <SearchControls />
+      <SearchControls getMarkers={getMarkers} />
     </Animated.View>
   );
 };
