@@ -14,8 +14,10 @@ import SearchControls from "./SearchControls";
 const { width, height } = Dimensions.get("screen");
 interface ActionProps {
   getMarkers: (data: any) => void;
+  lat: number;
+  lng: number;
 }
-const ActionSheet = ({ getMarkers }: ActionProps) => {
+const ActionSheet = ({ getMarkers, lat, lng }: ActionProps) => {
   const [alignment] = useState(new Animated.Value(0));
 
   const toggleActionSheet = (value: number) => {
