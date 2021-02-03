@@ -13,11 +13,11 @@ import SearchControls from "./SearchControls";
 
 const { width, height } = Dimensions.get("screen");
 interface ActionProps {
-  getMarkers: (data: any) => void;
+  setMarkers: (data: any) => void;
   lat: number;
   lng: number;
 }
-const ActionSheet = ({ getMarkers, lat, lng }: ActionProps) => {
+const ActionSheet = ({ setMarkers, lat, lng }: ActionProps) => {
   const [alignment] = useState(new Animated.Value(0));
 
   const toggleActionSheet = (value: number) => {
@@ -48,7 +48,12 @@ const ActionSheet = ({ getMarkers, lat, lng }: ActionProps) => {
         scrollEventThrottle={16}
         onScroll={(e) => gestureHandler(e)}
       ></ScrollView>
-      <SearchControls lat={lat} lng={lng} getMarkers={getMarkers} />
+      <SearchControls
+        lat={lat}
+        lng={lng}
+        setMarkers={setMarkers}
+        toggleActionSheet={toggleActionSheet}
+      />
     </Animated.View>
   );
 };
