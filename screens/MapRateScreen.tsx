@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Dimensions, Alert, TouchableOpacity } from "react-native";
+import { Tooltip } from "react-native-elements";
 import MapView from "react-native-maps";
 import ActionSheet from "../components/ActionSheet";
 import { Text, View } from "../components/Themed";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
+import { Ionicons } from "@expo/vector-icons";
+import Colors from "../constants/Colors";
+import useColorScheme from "../hooks/useColorScheme";
 
 const { width, height } = Dimensions.get("window");
 
@@ -23,9 +27,12 @@ export default function MapRateScreen() {
     longitudeDelta: 0.0421,
   });
 
+  const colorScheme = useColorScheme();
+  const color: string = Colors[colorScheme].tint;
   const verifyPermissions = async () => {
     const result = await Permissions.askAsync(Permissions.LOCATION);
-    if (result.status! == "granted") {
+
+    if (result.permissions.location.status !== "granted") {
       Alert.alert(
         "Insufficient permissions!",
         "You need to grant location permissions to use this feature.",
@@ -43,6 +50,7 @@ export default function MapRateScreen() {
   };
   const getLocationHandler = async () => {
     const hasPermission = await verifyPermissions();
+
     if (!hasPermission) {
       return;
     }
@@ -68,12 +76,14 @@ export default function MapRateScreen() {
   const changeRegionHandler = (region: Region) => {
     setRegion(region);
   };
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.floatButton}
-        onPress={getLocationHandler}
-      ></TouchableOpacity>
+      <TouchableOpacity style={styles.floatButton} onPress={getLocationHandler}>
+        <Tooltip width={200} popover={<Text>Show your current location</Text>}>
+          <Ionicons size={30} color={color} name="locate" />
+        </Tooltip>
+      </TouchableOpacity>
       <MapView
         style={styles.map}
         region={region}
@@ -99,15 +109,16 @@ const styles = StyleSheet.create({
     height,
   },
   floatButton: {
+    zIndex: 1,
     borderWidth: 1,
     borderColor: "rgba(0,0,0,0.2)",
     alignItems: "center",
     justifyContent: "center",
-    width: 70,
+    width: 32,
     position: "absolute",
-    bottom: 30,
+    top: 30,
     right: 10,
-    height: 70,
+    height: 32,
     backgroundColor: "#fff",
     borderRadius: 100,
   },
