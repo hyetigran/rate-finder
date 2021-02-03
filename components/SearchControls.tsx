@@ -1,6 +1,13 @@
-import React, { useState } from "react";
 import axios from "axios";
-import { StyleSheet, View, Text, Switch, Dimensions } from "react-native";
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Switch,
+  Dimensions,
+  Alert,
+} from "react-native";
 import { CheckBox, ButtonGroup, Button } from "react-native-elements";
 
 import { GOOGLE_API_KEY } from "@env";
@@ -21,12 +28,18 @@ const initialState = {
 };
 
 interface ActionProps {
-  getMarkers: (data: any) => void;
+  setMarkers: (data: any) => void;
+  toggleActionSheet: (value: number) => void;
   lat: number;
   lng: number;
 }
 
-const SearchControls = ({ getMarkers, lat, lng }: ActionProps) => {
+const SearchControls = ({
+  setMarkers,
+  toggleActionSheet,
+  lat,
+  lng,
+}: ActionProps) => {
   const [searchForm, setSearchForm] = useState<SearchForm>(initialState);
 
   const toggleSwitch = () => {
@@ -75,9 +88,34 @@ const SearchControls = ({ getMarkers, lat, lng }: ActionProps) => {
   const fetchMarkers = async (bestRate: { name: string; rate: number }) => {
     let type = searchForm.isCard ? "atm" : "bank";
     let keyword = bestRate.name;
-    let results = await axios.get(
-      `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=1500&type=${type}&keyword=${keyword}&key=${GOOGLE_API_KEY}`
-    );
+
+    try {
+      let response: any = await axios.get(
+        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=1500&type=${type}&keyword=${keyword}&key=${GOOGLE_API_KEY}`
+      );
+
+      let results = response.data.results.map((place: any) => {
+        let id = place.place_id;
+        let name = place.name;
+        let address = place.vicinity;
+        let latitude = place.geometry.location.lat;
+        let longitude = place.geometry.location.lng;
+        let isOpen = place.opening_hours?.open_now || false;
+
+        let marker = { id, name, address, latitude, longitude, isOpen };
+        return marker;
+      });
+
+      setMarkers(results);
+
+      toggleActionSheet(0);
+    } catch (error) {
+      Alert.alert(
+        "Something went wrong",
+        "We were unable to fetch search results. Please try again later.",
+        [{ text: "Okay" }]
+      );
+    }
   };
 
   return (

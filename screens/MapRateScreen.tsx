@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Dimensions, Alert, TouchableOpacity } from "react-native";
-import { Tooltip } from "react-native-elements";
-import MapView from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 import ActionSheet from "../components/ActionSheet";
 import { Text, View } from "../components/Themed";
 import * as Location from "expo-location";
@@ -18,8 +17,17 @@ interface Region {
   latitudeDelta: number;
   longitudeDelta: number;
 }
+
+interface Markers {
+  id: string;
+  name: string;
+  latitude: number;
+  longitude: number;
+  address: string;
+  isOpen: boolean;
+}
 export default function MapRateScreen() {
-  const [markers, setMarkers] = useState();
+  const [markers, setMarkers] = useState<Markers[]>();
   const [region, setRegion] = useState<Region>({
     latitude: 40.181119,
     longitude: 44.514658,
@@ -27,6 +35,7 @@ export default function MapRateScreen() {
     longitudeDelta: 0.0421,
   });
 
+  console.log("markers", markers);
   const colorScheme = useColorScheme();
   const color: string = Colors[colorScheme].tint;
   const verifyPermissions = async () => {
@@ -44,10 +53,7 @@ export default function MapRateScreen() {
   };
 
   useEffect(() => {});
-  const getMarkers = () => {
-    let data;
-    setMarkers(data);
-  };
+
   const getLocationHandler = async () => {
     const hasPermission = await verifyPermissions();
 
@@ -80,19 +86,31 @@ export default function MapRateScreen() {
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.floatButton} onPress={getLocationHandler}>
-        <Tooltip width={200} popover={<Text>Show your current location</Text>}>
-          <Ionicons size={30} color={color} name="locate" />
-        </Tooltip>
+        <Ionicons size={30} color={color} name="locate" />
       </TouchableOpacity>
       <MapView
         style={styles.map}
         region={region}
         onRegionChange={changeRegionHandler}
-      />
+      >
+        {markers &&
+          markers!.map((marker) => {
+            return (
+              <Marker
+                key={marker.id}
+                title={marker.name}
+                coordinate={{
+                  latitude: marker.latitude,
+                  longitude: marker.longitude,
+                }}
+              />
+            );
+          })}
+      </MapView>
       <ActionSheet
         lat={region.latitude}
         lng={region.longitude}
-        getMarkers={getMarkers}
+        setMarkers={setMarkers}
       />
     </View>
   );
