@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Dimensions, Alert, TouchableOpacity } from "react-native";
-import { Tooltip } from "react-native-elements";
 import MapView from "react-native-maps";
 import ActionSheet from "../components/ActionSheet";
 import { Text, View } from "../components/Themed";
@@ -80,9 +79,7 @@ export default function MapRateScreen() {
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.floatButton} onPress={getLocationHandler}>
-        <Tooltip width={200} popover={<Text>Show your current location</Text>}>
-          <Ionicons size={30} color={color} name="locate" />
-        </Tooltip>
+        <Ionicons size={30} color={color} name="locate" />
       </TouchableOpacity>
       <MapView
         style={styles.map}
