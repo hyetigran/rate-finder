@@ -48,7 +48,7 @@ const ActionSheet = ({ getMarkers, lat, lng }: ActionProps) => {
         scrollEventThrottle={16}
         onScroll={(e) => gestureHandler(e)}
       ></ScrollView>
-      <SearchControls getMarkers={getMarkers} />
+      <SearchControls lat={lat} lng={lng} getMarkers={getMarkers} />
     </Animated.View>
   );
 };
