@@ -3,7 +3,7 @@ import axios from "axios";
 import { StyleSheet, View, Text, Switch, Dimensions } from "react-native";
 import { CheckBox, ButtonGroup, Button } from "react-native-elements";
 
-import { GOOGLE_API_KEY } from "react-native-dotenv";
+import { GOOGLE_API_KEY } from "@env";
 import Colors from "../constants/Colors";
 
 const { width, height } = Dimensions.get("screen");
@@ -22,9 +22,11 @@ const initialState = {
 
 interface ActionProps {
   getMarkers: (data: any) => void;
+  lat: number;
+  lng: number;
 }
 
-const SearchControls = ({ getMarkers }: ActionProps) => {
+const SearchControls = ({ getMarkers, lat, lng }: ActionProps) => {
   const [searchForm, setSearchForm] = useState<SearchForm>(initialState);
 
   const toggleSwitch = () => {
@@ -74,7 +76,7 @@ const SearchControls = ({ getMarkers }: ActionProps) => {
     let type = searchForm.isCard ? "atm" : "bank";
     let keyword = bestRate.name;
     let results = await axios.get(
-      `https://maps.googleapis.com/maps/api/place/nearbysearch/json?type=${type}&keyword=${keyword}&key=${GOOGLE_API_KEY}`
+      `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=1500&type=${type}&keyword=${keyword}&key=${GOOGLE_API_KEY}`
     );
   };
 
