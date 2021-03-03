@@ -35,7 +35,7 @@ export default function MapRateScreen() {
     longitudeDelta: 0.0421,
   });
 
-  console.log("markers", markers);
+  console.log("rerender", region.latitude);
   const colorScheme = useColorScheme();
   const color: string = Colors[colorScheme].tint;
   const verifyPermissions = async () => {
@@ -79,9 +79,12 @@ export default function MapRateScreen() {
     }
   };
 
+  // Unecessary to update region state when moving or resizing map
   const changeRegionHandler = (region: Region) => {
     setRegion(region);
   };
+
+  const pinPressHandler = () => {};
 
   return (
     <View style={styles.container}>
@@ -91,7 +94,7 @@ export default function MapRateScreen() {
       <MapView
         style={styles.map}
         region={region}
-        onRegionChange={changeRegionHandler}
+        //onRegionChange={changeRegionHandler}
       >
         {markers &&
           markers!.map((marker) => {
@@ -103,6 +106,8 @@ export default function MapRateScreen() {
                   latitude: marker.latitude,
                   longitude: marker.longitude,
                 }}
+                tracksViewChanges={false}
+                onPress={pinPressHandler}
               />
             );
           })}
