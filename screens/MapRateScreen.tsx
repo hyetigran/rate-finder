@@ -10,6 +10,10 @@ import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
 
 const { width, height } = Dimensions.get("window");
+// Marker pin colors
+const PRIMARY_RATE_COLOR = "#fc3a24",
+  SECONDARY_RATE_COLOR = "#fc3a24",
+  CLOSED_RATE_COLOR = "#bbc0c4";
 
 interface Region {
   latitude: number;
@@ -102,10 +106,12 @@ export default function MapRateScreen() {
               <Marker
                 key={marker.id}
                 title={marker.name}
+                //description={marker}
                 coordinate={{
                   latitude: marker.latitude,
                   longitude: marker.longitude,
                 }}
+                pinColor={PRIMARY_RATE_COLOR}
                 tracksViewChanges={false}
                 onPress={pinPressHandler}
               />
