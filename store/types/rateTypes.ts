@@ -11,7 +11,8 @@ export interface RateState {
   gbp: BuySell;
 }
 export interface RootState {
-  rate: RateState;
+  banks: RateState[];
+  nonBanks: RateState[];
 }
 
 export const FETCH_RATES = "FETCH_RATES";

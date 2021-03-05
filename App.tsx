@@ -17,12 +17,12 @@ export default function App() {
   } else {
     const store = configureStore();
     return (
-      <SafeAreaProvider>
-        <Provider store={store}>
+      <Provider store={store}>
+        <SafeAreaProvider>
           <Navigation colorScheme={colorScheme} />
           <StatusBar />
-        </Provider>
-      </SafeAreaProvider>
+        </SafeAreaProvider>
+      </Provider>
     );
   }
 }

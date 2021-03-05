@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import {
   StyleSheet,
   View,
@@ -12,6 +13,7 @@ import { CheckBox, ButtonGroup, Button } from "react-native-elements";
 
 import { GOOGLE_API_KEY } from "@env";
 import Colors from "../constants/Colors";
+import { RateState, RootState } from "../store/types/rateTypes";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -41,6 +43,9 @@ const SearchControls = ({
   lng,
 }: ActionProps) => {
   const [searchForm, setSearchForm] = useState<SearchForm>(initialState);
+  const rateData = useSelector((state: RootState) => {
+    return state.rate.banks;
+  });
 
   const toggleSwitch = () => {
     setSearchForm((prevState: SearchForm) => {
@@ -65,24 +70,32 @@ const SearchControls = ({
     let cur = currency.toLowerCase();
     // Find best rate
     let buying = isBuy ? "buy" : "sell";
-    const bestRate = rateData
-      .map((bank: RD) => {
-        let specificRate: number = bank[cur][buying];
-        return { name: bank.bankName, rate: specificRate };
-      })
-      .reduce(
-        (prev: { name: string; rate: number }, current) => {
-          if (isBuy) {
-            return prev.rate > current.rate ? prev : current;
-          } else {
-            return prev.rate < current.rate ? prev : current;
-          }
-        },
-        { name: "", rate: 0 }
-      );
+    const bestRate =
+      rateData &&
+      rateData
+        .map((bank: RateState) => {
+          let specificRate: number = bank[cur][buying];
+          return { name: bank.bankName, rate: specificRate };
+        })
+        .reduce(
+          (
+            prev: { name: string; rate: number },
+            current: { name: string; rate: number }
+          ) => {
+            if (isBuy) {
+              return prev.rate > current.rate ? prev : current;
+            } else {
+              return prev.rate < current.rate ? prev : current;
+            }
+          },
+          { name: "", rate: 0 }
+        );
+    if (!bestRate) {
+      // Handle error if rate list fails to fetch/sort
+      return;
+    }
     // Call google places API for location
     fetchMarkers(bestRate);
-    // Use response to display markers on map
   };
 
   const fetchMarkers = async (bestRate: { name: string; rate: number }) => {
@@ -194,39 +207,3 @@ const styles = StyleSheet.create({
 });
 
 export default SearchControls;
-
-interface BuySell {
-  buy: number;
-  sell: number;
-}
-interface RD {
-  [key: string]: any;
-  bankName: string;
-  usd: BuySell;
-  eur: BuySell;
-  rub: BuySell;
-  gbp: BuySell;
-}
-const rateData: RD[] = [
-  {
-    bankName: "ameriabank",
-    usd: { buy: 80, sell: 100 },
-    eur: { buy: 100, sell: 100 },
-    rub: { buy: 100, sell: 100 },
-    gbp: { buy: 100, sell: 100 },
-  },
-  {
-    bankName: "araratbank",
-    usd: { buy: 100, sell: 110 },
-    eur: { buy: 100, sell: 100 },
-    rub: { buy: 100, sell: 100 },
-    gbp: { buy: 100, sell: 100 },
-  },
-  {
-    bankName: "byblosbank",
-    usd: { buy: 100, sell: 100 },
-    eur: { buy: 100, sell: 100 },
-    rub: { buy: 100, sell: 100 },
-    gbp: { buy: 100, sell: 100 },
-  },
-];

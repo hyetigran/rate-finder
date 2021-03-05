@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Dimensions, Alert, TouchableOpacity } from "react-native";
-import MapView, { Marker } from "react-native-maps";
-import ActionSheet from "../components/ActionSheet";
-import { Text, View } from "../components/Themed";
+import { useDispatch } from "react-redux";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 import { Ionicons } from "@expo/vector-icons";
+import MapView, { Marker } from "react-native-maps";
+
+import ActionSheet from "../components/ActionSheet";
+import { Text, View } from "../components/Themed";
 import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
+import { thunkGetRates } from "../store/actions/rateActions";
 
 const { width, height } = Dimensions.get("window");
 // Marker pin colors
@@ -39,7 +42,12 @@ export default function MapRateScreen() {
     longitudeDelta: 0.0421,
   });
 
-  console.log("rerender", region.latitude);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    // Load exchange rates
+    dispatch(thunkGetRates());
+  });
+
   const colorScheme = useColorScheme();
   const color: string = Colors[colorScheme].tint;
   const verifyPermissions = async () => {
@@ -55,8 +63,6 @@ export default function MapRateScreen() {
     }
     return true;
   };
-
-  useEffect(() => {});
 
   const getLocationHandler = async () => {
     const hasPermission = await verifyPermissions();

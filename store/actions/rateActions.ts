@@ -13,22 +13,17 @@ export const thunkGetRates = (): ThunkAction<
   Action<string>
 > => async (dispatch) => {
   try {
-    const result = await axios.get(GATEWAY_BASE_URL);
-
-    dispatch(fetchRates(result.items));
+    const result: any = await axios.get(GATEWAY_BASE_URL);
+    let parsedResult = JSON.parse(result.data.body);
+    dispatch(fetchRates(parsedResult.Item.Banks));
   } catch (error) {
     console.log(error);
   }
 };
 
 const fetchRates = (rates: RateState): RateActionTypes => {
-  for (let i = 0; i < exam.questions.length; i++) {
-    let shuffledAnswers = _(exam.questions[i].answers);
-    exam.questions[i].answers = shuffledAnswers;
-  }
-
   return {
-    type: FETCH_EXAM,
-    payload: exam,
+    type: FETCH_RATES,
+    payload: rates,
   };
 };
