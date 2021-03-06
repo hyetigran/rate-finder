@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import {
   StyleSheet,
-  View,
-  Text,
   Animated,
   Dimensions,
   NativeScrollEvent,
@@ -12,21 +10,12 @@ import { ScrollView } from "react-native-gesture-handler";
 import SearchControls from "./SearchControls";
 
 const { width, height } = Dimensions.get("screen");
-interface ActionProps {
-  setMarkers: (data: any) => void;
-  lat: number;
-  lng: number;
-}
-const ActionSheet = ({ setMarkers, lat, lng }: ActionProps) => {
-  const [alignment] = useState(new Animated.Value(0));
 
-  const toggleActionSheet = (value: number) => {
-    Animated.timing(alignment, {
-      toValue: value,
-      duration: 200,
-      useNativeDriver: false,
-    }).start();
-  };
+interface ActionProps {
+  submitSearch: (data: any) => void;
+}
+const ActionSheet = ({ submitSearch }: ActionProps) => {
+  const [alignment] = useState(new Animated.Value(0));
 
   const actionSheetIntropolate = alignment.interpolate({
     inputRange: [0, 1],
@@ -34,6 +23,14 @@ const ActionSheet = ({ setMarkers, lat, lng }: ActionProps) => {
   });
   const actionSheetStyle = {
     bottom: actionSheetIntropolate,
+  };
+
+  const toggleActionSheet = (value: number) => {
+    Animated.timing(alignment, {
+      toValue: value,
+      duration: 200,
+      useNativeDriver: false,
+    }).start();
   };
 
   const gestureHandler = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -49,9 +46,7 @@ const ActionSheet = ({ setMarkers, lat, lng }: ActionProps) => {
         onScroll={(e) => gestureHandler(e)}
       ></ScrollView>
       <SearchControls
-        lat={lat}
-        lng={lng}
-        setMarkers={setMarkers}
+        submitSearch={submitSearch}
         toggleActionSheet={toggleActionSheet}
       />
     </Animated.View>

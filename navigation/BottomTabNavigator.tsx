@@ -6,6 +6,7 @@ import * as React from "react";
 import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
 import MapRateScreen from "../screens/MapRateScreen";
+import BusinessDetailScreen from "../screens/BusinessDetailScreen";
 import TabTwoScreen from "../screens/TabTwoScreen";
 import { BottomTabParamList, TabOneParamList, TabTwoParamList } from "../types";
 
@@ -29,11 +30,11 @@ export default function BottomTabNavigator() {
         }}
       />
       <BottomTab.Screen
-        name="TabTwo"
+        name="Rate List"
         component={TabTwoNavigator}
         options={{
           tabBarIcon: ({ color }) => (
-            <TabBarIcon name="ios-code" color={color} />
+            <TabBarIcon name="ios-list" color={color} />
           ),
         }}
       />
@@ -62,6 +63,11 @@ function TabOneNavigator() {
         component={MapRateScreen}
         options={{ headerTitle: "Search Exchange Rate" }}
       />
+      <TabOneStack.Screen
+        name="BusinessDetailScreen"
+        component={BusinessDetailScreen}
+        options={{ headerTitle: "Detail Screen" }}
+      />
     </TabOneStack.Navigator>
   );
 }
@@ -74,7 +80,7 @@ function TabTwoNavigator() {
       <TabTwoStack.Screen
         name="TabTwoScreen"
         component={TabTwoScreen}
-        options={{ headerTitle: "Tab Two Title" }}
+        options={{ headerTitle: "Latest Exchange Rates" }}
       />
     </TabTwoStack.Navigator>
   );
