@@ -1,19 +1,8 @@
-import axios from "axios";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import {
-  StyleSheet,
-  View,
-  Text,
-  Switch,
-  Dimensions,
-  Alert,
-} from "react-native";
+import { StyleSheet, View, Text, Switch, Dimensions } from "react-native";
 import { CheckBox, ButtonGroup, Button } from "react-native-elements";
 
-import { GOOGLE_API_KEY } from "@env";
 import Colors from "../constants/Colors";
-import { RateState, RootState } from "../store/types/rateTypes";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -30,22 +19,12 @@ const initialState = {
 };
 
 interface ActionProps {
-  setMarkers: (data: any) => void;
-  toggleActionSheet: (value: number) => void;
-  lat: number;
-  lng: number;
+  submitSearch: (data: any) => void;
+  toggleActionSheet: (data: any) => void;
 }
 
-const SearchControls = ({
-  setMarkers,
-  toggleActionSheet,
-  lat,
-  lng,
-}: ActionProps) => {
+const SearchControls = ({ submitSearch, toggleActionSheet }: ActionProps) => {
   const [searchForm, setSearchForm] = useState<SearchForm>(initialState);
-  const rateData = useSelector((state: RootState) => {
-    return state.rate.banks;
-  });
 
   const toggleSwitch = () => {
     setSearchForm((prevState: SearchForm) => {
@@ -63,72 +42,6 @@ const SearchControls = ({
     setSearchForm((prevState: SearchForm) => {
       return { ...prevState, isBuy: !!!index };
     });
-  };
-
-  const submitSearch = () => {
-    const { isCard, isBuy, currency } = searchForm;
-    let cur = currency.toLowerCase();
-    // Find best rate
-    let buying = isBuy ? "buy" : "sell";
-    const bestRate =
-      rateData &&
-      rateData
-        .map((bank: RateState) => {
-          let specificRate: number = bank[cur][buying];
-          return { name: bank.bankName, rate: specificRate };
-        })
-        .reduce(
-          (
-            prev: { name: string; rate: number },
-            current: { name: string; rate: number }
-          ) => {
-            if (isBuy) {
-              return prev.rate > current.rate ? prev : current;
-            } else {
-              return prev.rate < current.rate ? prev : current;
-            }
-          },
-          { name: "", rate: 0 }
-        );
-    if (!bestRate) {
-      // Handle error if rate list fails to fetch/sort
-      return;
-    }
-    // Call google places API for location
-    fetchMarkers(bestRate);
-  };
-
-  const fetchMarkers = async (bestRate: { name: string; rate: number }) => {
-    let type = searchForm.isCard ? "atm" : "bank";
-    let keyword = bestRate.name;
-
-    try {
-      let response: any = await axios.get(
-        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=1500&type=${type}&keyword=${keyword}&key=${GOOGLE_API_KEY}`
-      );
-
-      let results = response.data.results.map((place: any) => {
-        let id = place.place_id;
-        let name = place.name;
-        let address = place.vicinity;
-        let latitude = place.geometry.location.lat;
-        let longitude = place.geometry.location.lng;
-        let isOpen = place.opening_hours?.open_now || false;
-
-        let marker = { id, name, address, latitude, longitude, isOpen };
-        return marker;
-      });
-
-      setMarkers(results);
-
-      toggleActionSheet(0);
-    } catch (error) {
-      Alert.alert(
-        "Something went wrong",
-        "We were unable to fetch search results. Please try again later.",
-        [{ text: "Okay" }]
-      );
-    }
   };
 
   return (
@@ -166,7 +79,15 @@ const SearchControls = ({
           );
         })}
       </View>
-      <Button onPress={submitSearch} title="Search" raised />
+      <Button
+        onPress={() => {
+          submitSearch(searchForm);
+          // Minimize action sheet
+          toggleActionSheet(0);
+        }}
+        title="Search"
+        raised
+      />
     </View>
   );
 };
