@@ -66,6 +66,7 @@ function TabOneNavigator() {
       <TabOneStack.Screen
         name="BusinessDetailScreen"
         component={BusinessDetailScreen}
+        // Refactor options to the component screen to dynamicall add biz name as header Title
         options={{ headerTitle: "Detail Screen" }}
       />
     </TabOneStack.Navigator>
