@@ -1,10 +1,24 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet } from "react-native";
 
 import EditScreenInfo from "../components/EditScreenInfo";
 import { Text, View } from "../components/Themed";
 
-export default function BusinessDetailScreen() {
+interface ActionProps {
+  route: { params: { placeId: string } };
+}
+
+export default function BusinessDetailScreen(props: ActionProps) {
+  const [businessDetail, setBusinessDetail] = useState();
+  const placeId = props.route.params.placeId;
+
+  useEffect(() => {
+    fetchBusinessDetails(placeId);
+  });
+  const fetchBusinessDetails = (placeId: string) => {
+    // AXIOS CALL to GOOGLE API
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tab Two</Text>

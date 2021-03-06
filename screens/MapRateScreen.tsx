@@ -219,7 +219,9 @@ export default function MapRateScreen(props: {
                 tracksViewChanges={false}
                 // onPress={pinPressHandler}
                 onCalloutPress={() =>
-                  props.navigation.navigate("BusinessDetailScreen")
+                  props.navigation.navigate("BusinessDetailScreen", {
+                    placeId: marker.id,
+                  })
                 }
               >
                 <Callout>
