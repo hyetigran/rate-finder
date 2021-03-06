@@ -5,13 +5,13 @@ import {
   Dimensions,
   Alert,
   TouchableOpacity,
-  Animated,
+  Button,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 import { Ionicons } from "@expo/vector-icons";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, Callout } from "react-native-maps";
 import { GOOGLE_API_KEY } from "@env";
 
 import ActionSheet from "../components/ActionSheet";
@@ -41,14 +41,19 @@ interface Region {
 }
 
 interface Markers {
+  rate: string;
   id: string;
   name: string;
   latitude: number;
   longitude: number;
   address: string;
   isOpen: boolean;
+  isBuy: boolean;
 }
-export default function MapRateScreen() {
+
+export default function MapRateScreen(props: {
+  navigation: { navigate: (arg0: string) => void };
+}) {
   const [markers, setMarkers] = useState<Markers[]>();
   const [region, setRegion] = useState<Region>({
     latitude: 40.181119,
@@ -137,12 +142,13 @@ export default function MapRateScreen() {
       return;
     }
     // Call google places API for location
-    fetchMarkers(bestRate, isCard);
+    fetchMarkers(bestRate, isCard, isBuy);
   };
 
   const fetchMarkers = async (
     bestRate: { name: string; rate: number },
-    isCard: boolean
+    isCard: boolean,
+    isBuy: boolean
   ) => {
     let type = isCard ? "atm" : "bank";
     let keyword = bestRate.name;
@@ -160,7 +166,16 @@ export default function MapRateScreen() {
         let longitude = place.geometry.location.lng;
         let isOpen = place.opening_hours?.open_now || false;
 
-        let marker = { id, name, address, latitude, longitude, isOpen };
+        let marker = {
+          id,
+          name,
+          address,
+          latitude,
+          longitude,
+          isOpen,
+          rate: bestRate.rate,
+          isBuy: isBuy,
+        };
         return marker;
       });
 
@@ -196,8 +211,6 @@ export default function MapRateScreen() {
             return (
               <Marker
                 key={marker.id}
-                title={marker.name}
-                //description={marker}
                 coordinate={{
                   latitude: marker.latitude,
                   longitude: marker.longitude,
@@ -205,7 +218,26 @@ export default function MapRateScreen() {
                 pinColor={PRIMARY_RATE_COLOR}
                 tracksViewChanges={false}
                 // onPress={pinPressHandler}
-              />
+                onCalloutPress={() =>
+                  props.navigation.navigate("BusinessDetailScreen")
+                }
+              >
+                <Callout>
+                  <View>
+                    <Text style={styles.calloutTitle}>
+                      {`${marker.name} `}{" "}
+                      <Ionicons
+                        size={18}
+                        color={color}
+                        name="help-circle-outline"
+                      />
+                    </Text>
+                    <Text>{`Rate to ${marker.isBuy ? "buy" : "sell"} AMD: ${
+                      marker.rate
+                    }`}</Text>
+                  </View>
+                </Callout>
+              </Marker>
             );
           })}
       </MapView>
@@ -237,5 +269,9 @@ const styles = StyleSheet.create({
     height: 32,
     backgroundColor: "#fff",
     borderRadius: 100,
+  },
+  calloutTitle: {
+    textAlign: "center",
+    fontWeight: "bold",
   },
 });
