@@ -2,20 +2,20 @@ import { FETCH_RATES, RateActionTypes } from "../types/rateTypes";
 const initialState = {
   banks: [
     {
-      bankName: "",
+      name: "",
       USD: { buy: 0, sell: 0 },
       EUR: { buy: 0, sell: 0 },
       GBP: { buy: 0, sell: 0 },
-      RUS: { buy: 0, sell: 0 },
+      RUB: { buy: 0, sell: 0 },
     },
   ],
   nonBanks: [
     {
-      nonBankName: "",
+      name: "",
       USD: { buy: 0, sell: 0 },
       EUR: { buy: 0, sell: 0 },
       GBP: { buy: 0, sell: 0 },
-      RUS: { buy: 0, sell: 0 },
+      RUB: { buy: 0, sell: 0 },
     },
   ],
 };
@@ -23,7 +23,6 @@ const initialState = {
 export const rateReducer = (state = initialState, action: RateActionTypes) => {
   switch (action.type) {
     case FETCH_RATES:
-      console.log("fire reducer");
       return {
         ...state,
         banks: action.payload,

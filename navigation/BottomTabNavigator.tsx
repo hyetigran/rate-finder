@@ -7,8 +7,8 @@ import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
 import MapRateScreen from "../screens/MapRateScreen";
 import BusinessDetailScreen from "../screens/BusinessDetailScreen";
-import TabTwoScreen from "../screens/TabTwoScreen";
 import { BottomTabParamList, TabOneParamList, TabTwoParamList } from "../types";
+import ExchangeRateList from "../screens/ExchangeRateListScreen";
 
 const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 
@@ -66,6 +66,7 @@ function TabOneNavigator() {
       <TabOneStack.Screen
         name="BusinessDetailScreen"
         component={BusinessDetailScreen}
+        // Refactor options to the component screen to dynamicall add biz name as header Title
         options={{ headerTitle: "Detail Screen" }}
       />
     </TabOneStack.Navigator>
@@ -78,8 +79,8 @@ function TabTwoNavigator() {
   return (
     <TabTwoStack.Navigator>
       <TabTwoStack.Screen
-        name="TabTwoScreen"
-        component={TabTwoScreen}
+        name="ExchangeRateListScreen"
+        component={ExchangeRateList}
         options={{ headerTitle: "Latest Exchange Rates" }}
       />
     </TabTwoStack.Navigator>

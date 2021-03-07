@@ -4,11 +4,11 @@ interface BuySell {
 }
 export interface RateState {
   [key: string]: any;
-  bankName: string;
-  usd: BuySell;
-  eur: BuySell;
-  rub: BuySell;
-  gbp: BuySell;
+  name: string;
+  USD: BuySell;
+  EUR: BuySell;
+  RUB: BuySell;
+  GBP: BuySell;
 }
 export interface RootState {
   rate: {
