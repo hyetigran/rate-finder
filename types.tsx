@@ -5,13 +5,14 @@ export type RootStackParamList = {
 
 export type BottomTabParamList = {
   Search: undefined;
-  TabTwo: undefined;
+  "Rate List": undefined;
 };
 
 export type TabOneParamList = {
   MapRateScreen: undefined;
+  BusinessDetailScreen: undefined;
 };
 
 export type TabTwoParamList = {
-  TabTwoScreen: undefined;
+  ExchangeRateListScreen: undefined;
 };
