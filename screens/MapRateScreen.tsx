@@ -204,6 +204,7 @@ export default function MapRateScreen(props: {
       <MapView
         style={styles.map}
         region={region}
+        showsUserLocation={true}
         //onRegionChange={changeRegionHandler}
       >
         {markers &&
