@@ -7,17 +7,37 @@ import { ButtonGroup } from "react-native-elements";
 import RateListRow from "../components/RateListRow";
 import { Text, View } from "../components/Themed";
 import { RateState, RootState } from "../store/types/rateTypes";
+import { computeDistanceBetween } from "@goparrot/react-native-geometry-utils";
 
-export default function ExchangeRateList() {
+export default function ExchangeRateList(props: any) {
+  const topTabName = props.route.name;
   const [currency, setCurrency] = useState("USD");
   const [paymentType, setPaymentType] = useState(0);
-  const rateData = useSelector((state: RootState) => {
-    let pmtType = paymentType === 1 ? "cash" : "card";
-    return state.rate[pmtType].filter(
-      (exchange: RateState) => exchange.isBank === 1
+
+  const [bankCash, bankCard, exchangeCash] = useSelector((state: RootState) => {
+    let bankCash = state.rate.cash;
+    let bankCard = state.rate.card.filter(
+      (bank: RateState) => bank.isBank === 1
     );
+    let exchangeCash = state.rate.card.filter(
+      (exchange: RateState) => exchange.isBank === 0
+    );
+    return [bankCash, bankCard, exchangeCash];
   });
-  // console.log(rateData);
+  let rateData: RateState[] = [];
+  if (topTabName === "Exchange") {
+    rateData = exchangeCash;
+    console.log("RD-ex");
+  } else {
+    if (paymentType === 1) {
+      console.log("RD-bCash");
+      rateData = bankCash;
+    } else {
+      console.log("RD-bCard");
+
+      rateData = bankCard;
+    }
+  }
 
   const paymentTypeHandler = (index: number) => {
     setPaymentType(index);
@@ -61,7 +81,9 @@ export default function ExchangeRateList() {
       {rateData && (
         <FlatList
           data={rateData}
-          keyExtractor={(item) => item.name}
+          keyExtractor={(item) => {
+            return !item.name ? item.name : Math.random().toString();
+          }}
           renderItem={(itemData: RateState) => (
             <RateListRow itemData={itemData} curr={currency} />
           )}
