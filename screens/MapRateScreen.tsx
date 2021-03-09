@@ -62,7 +62,7 @@ export default function MapRateScreen(props: {
     longitudeDelta: 0.0421,
   });
   const rateData = useSelector((state: RootState) => {
-    return state.rate.banks;
+    return state.rate.card;
   });
 
   const dispatch = useDispatch();
