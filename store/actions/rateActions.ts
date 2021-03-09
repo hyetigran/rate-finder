@@ -15,7 +15,7 @@ export const thunkGetRates = (): ThunkAction<
   try {
     const result: any = await axios.get(GATEWAY_BASE_URL);
     let parsedResult = JSON.parse(result.data.body);
-    dispatch(fetchRates(parsedResult.Item.Banks));
+    dispatch(fetchRates(parsedResult.Item));
   } catch (error) {
     console.log(error);
   }

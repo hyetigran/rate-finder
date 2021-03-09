@@ -9,10 +9,15 @@ import { Text, View } from "../components/Themed";
 import { RateState, RootState } from "../store/types/rateTypes";
 
 export default function ExchangeRateList() {
-  const rateData = useSelector((state: RootState) => state.rate.banks);
   const [currency, setCurrency] = useState("USD");
   const [paymentType, setPaymentType] = useState(0);
-  //console.log(rateData);
+  const rateData = useSelector((state: RootState) => {
+    let pmtType = paymentType === 1 ? "cash" : "card";
+    return state.rate[pmtType].filter(
+      (exchange: RateState) => exchange.isBank === 1
+    );
+  });
+  // console.log(rateData);
 
   const paymentTypeHandler = (index: number) => {
     setPaymentType(index);
@@ -49,7 +54,7 @@ export default function ExchangeRateList() {
         />
       </View>
       <View style={styles.rowContainer}>
-        <Text style={styles.rowName}>Bank Name</Text>
+        <Text style={styles.rowName}>Name</Text>
         <Text style={styles.rowCurr}>Buy</Text>
         <Text style={styles.rowCurr}>Sell</Text>
       </View>
