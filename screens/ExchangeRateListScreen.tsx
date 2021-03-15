@@ -1,32 +1,56 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, FlatList } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import DropDownPicker from "react-native-dropdown-picker";
 import { ButtonGroup } from "react-native-elements";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import RateListRow from "../components/RateListRow";
 import { Text, View } from "../components/Themed";
 import { RateState, RootState } from "../store/types/rateTypes";
-import { computeDistanceBetween } from "@goparrot/react-native-geometry-utils";
+import { addDistancePropertyToExchanges } from "../constants/CalcDistance";
+
+interface Location {
+  latitude: number;
+  longitude: number;
+}
 
 export default function ExchangeRateList(props: any) {
   const topTabName = props.route.name;
+  const initialPaymentType = topTabName === "Exchanges" ? 1 : 0;
+  const [userLocation, setUserLocation] = useState<Location>({
+    latitude: 0,
+    longitude: 0,
+  });
   const [currency, setCurrency] = useState("USD");
-  const [paymentType, setPaymentType] = useState(0);
+  const [paymentType, setPaymentType] = useState(initialPaymentType);
 
   const [bankCash, bankCard, exchangeCash] = useSelector((state: RootState) => {
-    let bankCash = state.rate.cash;
-    let bankCard = state.rate.card.filter(
-      (bank: RateState) => bank.isBank === 1
+    let bankCard = state.rate.card;
+    let bankCash = state.rate.cash.filter(
+      (bank: RateState) => bank.isBank == 1
     );
-    let exchangeCash = state.rate.card.filter(
-      (exchange: RateState) => exchange.isBank === 0
+    let exchangeCash = state.rate.cash.filter(
+      (exchange: RateState) => exchange.isBank == 0
     );
     return [bankCash, bankCard, exchangeCash];
   });
+  useEffect(() => {
+    saveUserLocation();
+  }, []);
+
   let rateData: RateState[] = [];
-  if (topTabName === "Exchange") {
-    rateData = exchangeCash;
+  if (topTabName === "Exchanges") {
+    // Check default location has been over-ridden
+    if (userLocation.latitude && userLocation.longitude) {
+      let enhExchangeCash: RateState[] = addDistancePropertyToExchanges(
+        exchangeCash,
+        userLocation
+      );
+      rateData = enhExchangeCash;
+    } else {
+      rateData = exchangeCash;
+    }
     console.log("RD-ex");
   } else {
     if (paymentType === 1) {
@@ -34,7 +58,6 @@ export default function ExchangeRateList(props: any) {
       rateData = bankCash;
     } else {
       console.log("RD-bCard");
-
       rateData = bankCard;
     }
   }
@@ -44,13 +67,28 @@ export default function ExchangeRateList(props: any) {
     // Show card/cash rates
   };
 
+  const getUserLocation = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem("userLocation");
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch (error) {
+      // Handle user location not previously stored/saved
+      console.log(error);
+    }
+  };
+
+  const saveUserLocation = async () => {
+    const userLocation: Location = await getUserLocation();
+    setUserLocation(userLocation);
+  };
+
   return (
     <View style={styles.mainContainer}>
       <View style={styles.optionContainer}>
         <View style={styles.typeContainer}>
           <ButtonGroup
             buttons={["Card", "Cash"]}
-            // disabled={}
+            disabled={topTabName === "Exchanges" ? [0] : false}
             selectedIndex={paymentType}
             onPress={paymentTypeHandler}
           ></ButtonGroup>
@@ -85,7 +123,11 @@ export default function ExchangeRateList(props: any) {
             return !item.name ? item.name : Math.random().toString();
           }}
           renderItem={(itemData: RateState) => (
-            <RateListRow itemData={itemData} curr={currency} />
+            <RateListRow
+              itemData={itemData}
+              curr={currency}
+              isBank={initialPaymentType}
+            />
           )}
         />
       )}

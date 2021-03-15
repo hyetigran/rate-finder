@@ -8,13 +8,23 @@ const { width, height } = Dimensions.get("screen");
 interface ActionProps {
   itemData: RateState;
   curr: string;
+  isBank: number;
 }
-const RateListRow = ({ itemData, curr }: ActionProps) => {
+const RateListRow = ({ itemData, curr, isBank }: ActionProps) => {
   const { item } = itemData;
 
   return (
     <View style={styles.rowContainer}>
-      <Text style={styles.rowName}>{item.name}</Text>
+      <View style={styles.rowNameContainer}>
+        <Text numberOfLines={1} style={styles.rowName}>
+          {item.name}
+        </Text>
+        {!!isBank && item.distance && (
+          <Text style={styles.distance}>{`(${item.distance.toFixed(
+            2
+          )}km)`}</Text>
+        )}
+      </View>
       <Text style={styles.rowCurr}>{item[curr].buy}</Text>
       <Text style={styles.rowCurr}>{item[curr].sell}</Text>
     </View>
@@ -30,13 +40,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 8,
   },
-  rowName: {
+  rowNameContainer: {
     flex: 3,
+  },
+  rowName: {
+    width: "66%",
     fontWeight: "bold",
   },
+  distance: {},
   rowCurr: {
     flex: 1,
     textAlign: "center",
+    alignSelf: "center",
   },
 });
 

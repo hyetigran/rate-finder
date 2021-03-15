@@ -10,6 +10,7 @@ export interface RateState {
   RUB: BuySell;
   GBP: BuySell;
   isBank: number;
+  distance?: number;
 }
 export interface RootState {
   rate: {
