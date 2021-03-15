@@ -21,10 +21,15 @@ export interface RootState {
 }
 
 export const FETCH_RATES = "FETCH_RATES";
+export const SORT_RATES = "SORT_RATES";
 
 interface getRatesAction {
   type: typeof FETCH_RATES;
   payload: RateState;
 }
 
-export type RateActionTypes = getRatesAction;
+interface sortRatesAction {
+  type: typeof SORT_RATES;
+  payload: RateState;
+}
+export type RateActionTypes = getRatesAction | sortRatesAction;

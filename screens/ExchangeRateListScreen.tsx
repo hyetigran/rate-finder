@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import { useSelector } from "react-redux";
 import DropDownPicker from "react-native-dropdown-picker";
-import { ButtonGroup } from "react-native-elements";
+import { ButtonGroup, colors } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -25,8 +25,8 @@ export default function ExchangeRateList(props: any) {
   });
   const [currency, setCurrency] = useState("USD");
   const [paymentType, setPaymentType] = useState(initialPaymentType);
-  const [sortColumn, setSortColumn] = useState(0); // 0 distance, 1 buy, 2 sell
-  const [sortType, setSortType] = useState(0); // 0 none, 1 min, 2 max
+  const [sortColumn, setSortColumn] = useState(-1); // initial (not set) -1, 0 distance, 1 buy, 2 sell
+  const [sortType, setSortType] = useState(true); // true max to min, false min to max
 
   const [bankCash, bankCard, exchangeCash] = useSelector((state: RootState) => {
     let bankCard = state.rate.card;
@@ -38,32 +38,42 @@ export default function ExchangeRateList(props: any) {
     );
     return [bankCash, bankCard, exchangeCash];
   });
+  const [rateData, setRateData] = useState<RateState[]>();
+
   useEffect(() => {
     saveUserLocation();
   }, []);
 
-  let rateData: RateState[] = [];
-  if (topTabName === "Exchanges") {
-    // Check default location has been over-ridden
-    if (userLocation.latitude && userLocation.longitude) {
-      let enhExchangeCash: RateState[] = addDistancePropertyToExchanges(
-        exchangeCash,
-        userLocation
-      );
-      rateData = enhExchangeCash;
+  console.log("top", topTabName);
+  useEffect(() => {
+    rateDataHandler();
+  }, [topTabName]);
+
+  const rateDataHandler = () => {
+    let rawData: RateState[] = [];
+    if (topTabName === "Exchanges") {
+      // Check default location has been over-ridden
+      if (userLocation.latitude && userLocation.longitude) {
+        let enhExchangeCash: RateState[] = addDistancePropertyToExchanges(
+          exchangeCash,
+          userLocation
+        );
+        rawData = enhExchangeCash;
+      } else {
+        rawData = exchangeCash;
+      }
+      console.log("RD-ex");
     } else {
-      rateData = exchangeCash;
+      if (paymentType === 1) {
+        console.log("RD-bCash");
+        rawData = bankCash;
+      } else {
+        console.log("RD-bCard");
+        rawData = bankCard;
+      }
+      setRateData(rawData);
     }
-    console.log("RD-ex");
-  } else {
-    if (paymentType === 1) {
-      console.log("RD-bCash");
-      rateData = bankCash;
-    } else {
-      console.log("RD-bCard");
-      rateData = bankCard;
-    }
-  }
+  };
 
   const paymentTypeHandler = (index: number) => {
     setPaymentType(index);
@@ -83,6 +93,15 @@ export default function ExchangeRateList(props: any) {
   const saveUserLocation = async () => {
     const userLocation: Location = await getUserLocation();
     setUserLocation(userLocation);
+  };
+
+  const sortColumnHandler = (col: number) => {
+    if (sortColumn == col) {
+      // Toggle sortType
+      setSortType(!sortType);
+    } else {
+      setSortColumn(col);
+    }
   };
 
   return (
@@ -115,17 +134,41 @@ export default function ExchangeRateList(props: any) {
         />
       </View>
       <View style={styles.rowContainer}>
-        <TouchableOpacity style={styles.rowName}>
+        <TouchableOpacity
+          style={styles.rowName}
+          onPress={() => sortColumnHandler(0)}
+        >
           <Text>Name</Text>
-          <Ionicons size={24} name="caret-up-outline" />
+          {sortColumn === 0 && (
+            <Ionicons
+              size={20}
+              name={`caret-${sortType ? "up" : "down"}-outline`}
+            />
+          )}
         </TouchableOpacity>
-        <TouchableOpacity style={styles.rowCurr}>
+        <TouchableOpacity
+          style={styles.rowCurr}
+          onPress={() => sortColumnHandler(1)}
+        >
           <Text>Buy</Text>
-          <Ionicons size={24} name="caret-up-outline" />
+          {sortColumn === 1 && (
+            <Ionicons
+              size={24}
+              name={`caret-${sortType ? "up" : "down"}-outline`}
+            />
+          )}
         </TouchableOpacity>
-        <TouchableOpacity style={styles.rowCurr}>
+        <TouchableOpacity
+          style={styles.rowCurr}
+          onPress={() => sortColumnHandler(2)}
+        >
           <Text>Sell</Text>
-          <Ionicons size={24} name="caret-up-outline" />
+          {sortColumn === 2 && (
+            <Ionicons
+              size={24}
+              name={`caret-${sortType ? "up" : "down"}-outline`}
+            />
+          )}
         </TouchableOpacity>
       </View>
       {rateData && (
@@ -180,6 +223,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     paddingHorizontal: 8,
     paddingVertical: 8,
+    height: 40,
   },
   rowName: {
     flex: 3,

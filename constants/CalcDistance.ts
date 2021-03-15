@@ -6,7 +6,6 @@ export function addDistancePropertyToExchanges(
   userLocation: { latitude: number; longitude: number }
 ) {
   const { latitude, longitude } = userLocation;
-  console.log(latitude, longitude);
   for (var i in data) {
     for (var j in exchangeData) {
       if (data[i].name === exchangeData[j].name) {
@@ -17,6 +16,7 @@ export function addDistancePropertyToExchanges(
   }
   return data;
 }
+// As the crow flies
 function calcDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
   var R = 6371; // Radius of the earth in km
   var dLat = deg2rad(lat2 - lat1); // deg2rad below

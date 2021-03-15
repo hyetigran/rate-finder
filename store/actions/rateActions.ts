@@ -19,23 +19,6 @@ export const thunkGetRates = (): ThunkAction<
   try {
     const result: any = await axios.get(GATEWAY_BASE_URL);
     let parsedResult = JSON.parse(result.data.body);
-    // let rates = parsedResult.Item;
-    // let userLocation = await AsyncStorage.getItem("userLocation");
-    // let userCoords;
-
-    // if (userLocation == null) {
-    //   let location = await getUserLocation();
-    //   userCoords = {
-    //     latitude: location!.coords.latitude,
-    //     longitude: location!.coords.longitude,
-    //   };
-    // } else {
-    //   let coordData = JSON.parse(userLocation);
-    //   userCoords = {
-    //     latitude: coordData.latitude,
-    //     longitude: coordData.longitude,
-    //   };
-    // }
 
     dispatch(fetchRates(parsedResult.Item));
   } catch (error) {
@@ -50,27 +33,34 @@ const fetchRates = (rates: RateState): RateActionTypes => {
   };
 };
 
-const getUserLocation = async () => {
-  const hasPermission = await verifyPermissions();
-
-  if (!hasPermission) {
-    return;
-  }
-
-  try {
-    const location = await Location.getCurrentPositionAsync();
-    await AsyncStorage.setItem("userLocation", JSON.stringify(location.coords));
-    return location;
-  } catch (error) {
-    console.log(error);
-  }
+const sortRateList = (rates: RateState): RateActionTypes => {
+  return {
+    type: SORT_RATES,
+    payload: rates,
+  };
 };
+// UNUSED ACTIONS
+// const getUserLocation = async () => {
+//   const hasPermission = await verifyPermissions();
 
-const verifyPermissions = async () => {
-  const result = await Permissions.askAsync(Permissions.LOCATION);
+//   if (!hasPermission) {
+//     return;
+//   }
 
-  if (result.permissions.location.status !== "granted") {
-    return false;
-  }
-  return true;
-};
+//   try {
+//     const location = await Location.getCurrentPositionAsync();
+//     await AsyncStorage.setItem("userLocation", JSON.stringify(location.coords));
+//     return location;
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
+
+// const verifyPermissions = async () => {
+//   const result = await Permissions.askAsync(Permissions.LOCATION);
+
+//   if (result.permissions.location.status !== "granted") {
+//     return false;
+//   }
+//   return true;
+// };
