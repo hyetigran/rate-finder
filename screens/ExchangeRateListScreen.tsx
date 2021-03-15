@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, FlatList } from "react-native";
+import { StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import { useSelector } from "react-redux";
 import DropDownPicker from "react-native-dropdown-picker";
 import { ButtonGroup } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
 
 import RateListRow from "../components/RateListRow";
 import { Text, View } from "../components/Themed";
@@ -24,6 +25,8 @@ export default function ExchangeRateList(props: any) {
   });
   const [currency, setCurrency] = useState("USD");
   const [paymentType, setPaymentType] = useState(initialPaymentType);
+  const [sortColumn, setSortColumn] = useState(0); // 0 distance, 1 buy, 2 sell
+  const [sortType, setSortType] = useState(0); // 0 none, 1 min, 2 max
 
   const [bankCash, bankCard, exchangeCash] = useSelector((state: RootState) => {
     let bankCard = state.rate.card;
@@ -112,9 +115,18 @@ export default function ExchangeRateList(props: any) {
         />
       </View>
       <View style={styles.rowContainer}>
-        <Text style={styles.rowName}>Name</Text>
-        <Text style={styles.rowCurr}>Buy</Text>
-        <Text style={styles.rowCurr}>Sell</Text>
+        <TouchableOpacity style={styles.rowName}>
+          <Text>Name</Text>
+          <Ionicons size={24} name="caret-up-outline" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.rowCurr}>
+          <Text>Buy</Text>
+          <Ionicons size={24} name="caret-up-outline" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.rowCurr}>
+          <Text>Sell</Text>
+          <Ionicons size={24} name="caret-up-outline" />
+        </TouchableOpacity>
       </View>
       {rateData && (
         <FlatList
@@ -171,12 +183,12 @@ const styles = StyleSheet.create({
   },
   rowName: {
     flex: 3,
-    fontWeight: "bold",
-    fontSize: 18,
+    flexDirection: "row",
+    alignItems: "center",
   },
   rowCurr: {
     flex: 1,
-    textAlign: "center",
-    fontWeight: "bold",
+    flexDirection: "row",
+    alignItems: "center",
   },
 });
