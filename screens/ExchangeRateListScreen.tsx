@@ -56,37 +56,6 @@ export default function ExchangeRateList(props: any) {
     saveUserLocation();
   }, []);
 
-  // console.log("top", topTabName);
-  // useEffect(() => {
-  //   rateDataHandler();
-  // }, [topTabName]);
-
-  // const rateDataHandler = () => {
-  //   let rawData: RateState[] = [];
-  //   if (topTabName === "Exchanges") {
-  //     // Check default location has been over-ridden
-  //     if (userLocation.latitude && userLocation.longitude) {
-  //       let enhExchangeCash: RateState[] = addDistancePropertyToExchanges(
-  //         exchangeCash,
-  //         userLocation
-  //       );
-  //       rawData = enhExchangeCash;
-  //     } else {
-  //       rawData = exchangeCash;
-  //     }
-  //     console.log("RD-ex");
-  //   } else {
-  //     if (paymentType === 1) {
-  //       console.log("RD-bCash");
-  //       rawData = bankCash;
-  //     } else {
-  //       console.log("RD-bCard");
-  //       rawData = bankCard;
-  //     }
-  //     setRateData(rawData);
-  //   }
-  // };
-
   const paymentTypeHandler = (index: number) => {
     setPaymentType(index);
     // Show card/cash rates
