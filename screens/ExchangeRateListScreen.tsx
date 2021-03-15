@@ -28,52 +28,64 @@ export default function ExchangeRateList(props: any) {
   const [sortColumn, setSortColumn] = useState(-1); // initial (not set) -1, 0 distance, 1 buy, 2 sell
   const [sortType, setSortType] = useState(true); // true max to min, false min to max
 
-  const [bankCash, bankCard, exchangeCash] = useSelector((state: RootState) => {
-    let bankCard = state.rate.card;
-    let bankCash = state.rate.cash.filter(
-      (bank: RateState) => bank.isBank == 1
-    );
-    let exchangeCash = state.rate.cash.filter(
-      (exchange: RateState) => exchange.isBank == 0
-    );
-    return [bankCash, bankCard, exchangeCash];
+  const rateData = useSelector((state: RootState) => {
+    if (topTabName === "Exchanges") {
+      let exchangeData = state.rate.cash.filter(
+        (exchange: RateState) => exchange.isBank == 0
+      );
+      // Check default location has been over-ridden
+      if (userLocation.latitude && userLocation.longitude) {
+        let enhExchangeCash: RateState[] = addDistancePropertyToExchanges(
+          exchangeData,
+          userLocation
+        );
+        return enhExchangeCash;
+      } else {
+        return exchangeData;
+      }
+    } else {
+      if (paymentType === 1) {
+        return state.rate.cash.filter((bank: RateState) => bank.isBank == 1);
+      } else {
+        return state.rate.card;
+      }
+    }
   });
-  const [rateData, setRateData] = useState<RateState[]>();
 
   useEffect(() => {
     saveUserLocation();
   }, []);
 
-  console.log("top", topTabName);
-  useEffect(() => {
-    rateDataHandler();
-  }, [topTabName]);
+  // console.log("top", topTabName);
+  // useEffect(() => {
+  //   rateDataHandler();
+  // }, [topTabName]);
 
-  const rateDataHandler = () => {
-    let rawData: RateState[] = [];
-    if (topTabName === "Exchanges") {
-      // Check default location has been over-ridden
-      if (userLocation.latitude && userLocation.longitude) {
-        let enhExchangeCash: RateState[] = addDistancePropertyToExchanges(
-          exchangeCash,
-          userLocation
-        );
-        rawData = enhExchangeCash;
-      } else {
-        rawData = exchangeCash;
-      }
-      console.log("RD-ex");
-    } else {
-      if (paymentType === 1) {
-        console.log("RD-bCash");
-        rawData = bankCash;
-      } else {
-        console.log("RD-bCard");
-        rawData = bankCard;
-      }
-      setRateData(rawData);
-    }
-  };
+  // const rateDataHandler = () => {
+  //   let rawData: RateState[] = [];
+  //   if (topTabName === "Exchanges") {
+  //     // Check default location has been over-ridden
+  //     if (userLocation.latitude && userLocation.longitude) {
+  //       let enhExchangeCash: RateState[] = addDistancePropertyToExchanges(
+  //         exchangeCash,
+  //         userLocation
+  //       );
+  //       rawData = enhExchangeCash;
+  //     } else {
+  //       rawData = exchangeCash;
+  //     }
+  //     console.log("RD-ex");
+  //   } else {
+  //     if (paymentType === 1) {
+  //       console.log("RD-bCash");
+  //       rawData = bankCash;
+  //     } else {
+  //       console.log("RD-bCard");
+  //       rawData = bankCard;
+  //     }
+  //     setRateData(rawData);
+  //   }
+  // };
 
   const paymentTypeHandler = (index: number) => {
     setPaymentType(index);
