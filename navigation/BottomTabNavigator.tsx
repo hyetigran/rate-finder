@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as React from "react";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 
 import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
@@ -73,6 +74,16 @@ function TabOneNavigator() {
   );
 }
 
+const TopTabStack = createMaterialTopTabNavigator();
+
+function TopTabTwoNavigator() {
+  return (
+    <TopTabStack.Navigator>
+      <TopTabStack.Screen name="Banks" component={ExchangeRateList} />
+      <TopTabStack.Screen name="Exchanges" component={ExchangeRateList} />
+    </TopTabStack.Navigator>
+  );
+}
 const TabTwoStack = createStackNavigator<TabTwoParamList>();
 
 function TabTwoNavigator() {
@@ -80,7 +91,7 @@ function TabTwoNavigator() {
     <TabTwoStack.Navigator>
       <TabTwoStack.Screen
         name="ExchangeRateListScreen"
-        component={ExchangeRateList}
+        component={TopTabTwoNavigator}
         options={{ headerTitle: "Latest Exchange Rates" }}
       />
     </TabTwoStack.Navigator>

@@ -20,6 +20,7 @@ import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
 import { thunkGetRates } from "../store/actions/rateActions";
 import { RateState, RootState } from "../store/types/rateTypes";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
 // Marker pin colors
@@ -62,7 +63,7 @@ export default function MapRateScreen(props: {
     longitudeDelta: 0.0421,
   });
   const rateData = useSelector((state: RootState) => {
-    return state.rate.banks;
+    return state.rate.card;
   });
 
   const dispatch = useDispatch();
@@ -103,6 +104,10 @@ export default function MapRateScreen(props: {
           latitude: location.coords.latitude,
         };
       });
+      await AsyncStorage.setItem(
+        "userLocation",
+        JSON.stringify(location.coords)
+      );
     } catch (error) {
       Alert.alert(
         "Could not fetch location!",
@@ -204,6 +209,7 @@ export default function MapRateScreen(props: {
       <MapView
         style={styles.map}
         region={region}
+        showsUserLocation={true}
         //onRegionChange={changeRegionHandler}
       >
         {markers &&

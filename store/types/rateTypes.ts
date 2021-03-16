@@ -9,11 +9,14 @@ export interface RateState {
   EUR: BuySell;
   RUB: BuySell;
   GBP: BuySell;
+  isBank: number;
+  distance?: number;
 }
 export interface RootState {
   rate: {
-    banks: RateState[];
-    nonBanks: RateState[];
+    [key: string]: any;
+    card: RateState[];
+    cash: RateState[];
   };
 }
 
