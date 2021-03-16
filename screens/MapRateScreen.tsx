@@ -125,7 +125,6 @@ export default function MapRateScreen(props: {
       rateData &&
       rateData
         .map((bank: RateState) => {
-          console.log("bank in map", bank);
           let specificRate: number = bank[currency][buying];
           return { name: bank.bankName, rate: specificRate };
         })

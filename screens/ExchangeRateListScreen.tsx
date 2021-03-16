@@ -1,19 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, FlatList } from "react-native";
-import { useSelector } from "react-redux";
+import { StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import { useSelector, useDispatch } from "react-redux";
 import DropDownPicker from "react-native-dropdown-picker";
 import { ButtonGroup } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
 
 import RateListRow from "../components/RateListRow";
 import { Text, View } from "../components/Themed";
 import { RateState, RootState } from "../store/types/rateTypes";
 import { addDistancePropertyToExchanges } from "../constants/CalcDistance";
+import Colors from "../constants/Colors";
+
+import { sortRateList } from "../store/actions/rateActions";
 
 interface Location {
   latitude: number;
   longitude: number;
 }
+const primaryBlue = Colors.light.primary;
 
 export default function ExchangeRateList(props: any) {
   const topTabName = props.route.name;
@@ -24,43 +29,36 @@ export default function ExchangeRateList(props: any) {
   });
   const [currency, setCurrency] = useState("USD");
   const [paymentType, setPaymentType] = useState(initialPaymentType);
+  const [sortColumn, setSortColumn] = useState(-1); // initial (not set) -1, 0 distance, 1 buy, 2 sell
+  const [sortType, setSortType] = useState(true); // true max to min, false min to max
 
-  const [bankCash, bankCard, exchangeCash] = useSelector((state: RootState) => {
-    let bankCard = state.rate.card;
-    let bankCash = state.rate.cash.filter(
-      (bank: RateState) => bank.isBank == 1
-    );
-    let exchangeCash = state.rate.cash.filter(
-      (exchange: RateState) => exchange.isBank == 0
-    );
-    return [bankCash, bankCard, exchangeCash];
+  const rateData: RateState[] = useSelector((state: RootState) => {
+    if (topTabName === "Exchanges") {
+      let exchangeData = state.rate.exchangeCash;
+      // Check default location has been over-ridden
+      if (userLocation.latitude && userLocation.longitude) {
+        let enhExchangeCash: RateState[] = addDistancePropertyToExchanges(
+          exchangeData,
+          userLocation
+        );
+        return enhExchangeCash;
+      } else {
+        return exchangeData;
+      }
+    } else {
+      if (paymentType === 1) {
+        return state.rate.bankCash;
+      } else {
+        return state.rate.bankCard;
+      }
+    }
   });
+  //console.log("rateD", rateData[0]);
+  const dispatch = useDispatch();
+
   useEffect(() => {
     saveUserLocation();
   }, []);
-
-  let rateData: RateState[] = [];
-  if (topTabName === "Exchanges") {
-    // Check default location has been over-ridden
-    if (userLocation.latitude && userLocation.longitude) {
-      let enhExchangeCash: RateState[] = addDistancePropertyToExchanges(
-        exchangeCash,
-        userLocation
-      );
-      rateData = enhExchangeCash;
-    } else {
-      rateData = exchangeCash;
-    }
-    console.log("RD-ex");
-  } else {
-    if (paymentType === 1) {
-      console.log("RD-bCash");
-      rateData = bankCash;
-    } else {
-      console.log("RD-bCard");
-      rateData = bankCard;
-    }
-  }
 
   const paymentTypeHandler = (index: number) => {
     setPaymentType(index);
@@ -80,6 +78,21 @@ export default function ExchangeRateList(props: any) {
   const saveUserLocation = async () => {
     const userLocation: Location = await getUserLocation();
     setUserLocation(userLocation);
+  };
+
+  const sortColumnHandler = (col: number) => {
+    let keyName =
+      topTabName !== "Exchanges"
+        ? paymentType === 1
+          ? "bankCash"
+          : "bankCard"
+        : "exchangeCash";
+
+    if (sortColumn !== col) {
+      setSortColumn(col);
+    }
+    setSortType(!sortType);
+    dispatch(sortRateList(rateData, col, sortType, keyName, currency));
   };
 
   return (
@@ -112,9 +125,44 @@ export default function ExchangeRateList(props: any) {
         />
       </View>
       <View style={styles.rowContainer}>
+        {/* <TouchableOpacity
+          style={styles.rowName}
+          //onPress={() => sortColumnHandler(0)}
+        > */}
         <Text style={styles.rowName}>Name</Text>
-        <Text style={styles.rowCurr}>Buy</Text>
-        <Text style={styles.rowCurr}>Sell</Text>
+        {/* {sortColumn === 0 && (
+            <Ionicons
+              size={20}
+              name={`caret-${sortType ? "up" : "down"}-outline`}
+            />
+          )} */}
+        {/* </TouchableOpacity> */}
+        <TouchableOpacity
+          style={styles.rowCurr}
+          onPress={() => sortColumnHandler(1)}
+        >
+          <Text>Buy</Text>
+          {sortColumn === 1 && (
+            <Ionicons
+              size={22}
+              color={primaryBlue}
+              name={`caret-${sortType ? "up" : "down"}-outline`}
+            />
+          )}
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.rowCurr}
+          onPress={() => sortColumnHandler(2)}
+        >
+          <Text>Sell</Text>
+          {sortColumn === 2 && (
+            <Ionicons
+              size={22}
+              color={primaryBlue}
+              name={`caret-${sortType ? "up" : "down"}-outline`}
+            />
+          )}
+        </TouchableOpacity>
       </View>
       {rateData && (
         <FlatList
@@ -168,15 +216,16 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     paddingHorizontal: 8,
     paddingVertical: 8,
+    height: 40,
   },
   rowName: {
     flex: 3,
-    fontWeight: "bold",
-    fontSize: 18,
+    flexDirection: "row",
+    alignItems: "center",
   },
   rowCurr: {
     flex: 1,
-    textAlign: "center",
-    fontWeight: "bold",
+    flexDirection: "row",
+    alignItems: "center",
   },
 });
