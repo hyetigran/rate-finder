@@ -10,12 +10,15 @@ import RateListRow from "../components/RateListRow";
 import { Text, View } from "../components/Themed";
 import { RateState, RootState } from "../store/types/rateTypes";
 import { addDistancePropertyToExchanges } from "../constants/CalcDistance";
+import Colors from "../constants/Colors";
+
 import { sortRateList } from "../store/actions/rateActions";
 
 interface Location {
   latitude: number;
   longitude: number;
 }
+const primaryBlue = Colors.light.primary;
 
 export default function ExchangeRateList(props: any) {
   const topTabName = props.route.name;
@@ -141,7 +144,8 @@ export default function ExchangeRateList(props: any) {
           <Text>Buy</Text>
           {sortColumn === 1 && (
             <Ionicons
-              size={24}
+              size={22}
+              color={primaryBlue}
               name={`caret-${sortType ? "up" : "down"}-outline`}
             />
           )}
@@ -153,7 +157,8 @@ export default function ExchangeRateList(props: any) {
           <Text>Sell</Text>
           {sortColumn === 2 && (
             <Ionicons
-              size={24}
+              size={22}
+              color={primaryBlue}
               name={`caret-${sortType ? "up" : "down"}-outline`}
             />
           )}
