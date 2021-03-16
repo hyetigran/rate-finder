@@ -9,15 +9,14 @@ export interface RateState {
   EUR: BuySell;
   RUB: BuySell;
   GBP: BuySell;
-  isBank: number;
+  isBank?: number;
   distance?: number;
 }
 export interface RootState {
-  rate: {
-    [key: string]: any;
-    card: RateState[];
-    cash: RateState[];
-  };
+  [key: string]: any;
+  bankCash: RateState[];
+  bankCard: RateState[];
+  exchangeCash: RateState[];
 }
 
 export const FETCH_RATES = "FETCH_RATES";
@@ -25,11 +24,11 @@ export const SORT_RATES = "SORT_RATES";
 
 interface getRatesAction {
   type: typeof FETCH_RATES;
-  payload: RateState;
+  payload: RootState;
 }
 
 interface sortRatesAction {
   type: typeof SORT_RATES;
-  payload: RateState;
+  payload: RateState[];
 }
 export type RateActionTypes = getRatesAction | sortRatesAction;

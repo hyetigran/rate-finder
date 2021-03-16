@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, FlatList, TouchableOpacity } from "react-native";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import DropDownPicker from "react-native-dropdown-picker";
-import { ButtonGroup, colors } from "react-native-elements";
+import { ButtonGroup } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -10,6 +10,7 @@ import RateListRow from "../components/RateListRow";
 import { Text, View } from "../components/Themed";
 import { RateState, RootState } from "../store/types/rateTypes";
 import { addDistancePropertyToExchanges } from "../constants/CalcDistance";
+import { sortRateList } from "../store/actions/rateActions";
 
 interface Location {
   latitude: number;
@@ -28,11 +29,9 @@ export default function ExchangeRateList(props: any) {
   const [sortColumn, setSortColumn] = useState(-1); // initial (not set) -1, 0 distance, 1 buy, 2 sell
   const [sortType, setSortType] = useState(true); // true max to min, false min to max
 
-  const rateData = useSelector((state: RootState) => {
+  const rateData: RateState[] = useSelector((state: RootState) => {
     if (topTabName === "Exchanges") {
-      let exchangeData = state.rate.cash.filter(
-        (exchange: RateState) => exchange.isBank == 0
-      );
+      let exchangeData = state.rate.exchangeCash;
       // Check default location has been over-ridden
       if (userLocation.latitude && userLocation.longitude) {
         let enhExchangeCash: RateState[] = addDistancePropertyToExchanges(
@@ -45,12 +44,14 @@ export default function ExchangeRateList(props: any) {
       }
     } else {
       if (paymentType === 1) {
-        return state.rate.cash.filter((bank: RateState) => bank.isBank == 1);
+        return state.rate.bankCash;
       } else {
-        return state.rate.card;
+        return state.rate.bankCard;
       }
     }
   });
+  //console.log("rateD", rateData[0]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     saveUserLocation();
@@ -80,6 +81,7 @@ export default function ExchangeRateList(props: any) {
     if (sortColumn == col) {
       // Toggle sortType
       setSortType(!sortType);
+      dispatch(sortRateList(rateData, col, sortType));
     } else {
       setSortColumn(col);
     }
