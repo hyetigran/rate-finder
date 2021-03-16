@@ -78,20 +78,18 @@ export default function ExchangeRateList(props: any) {
   };
 
   const sortColumnHandler = (col: number) => {
-    if (sortColumn == col) {
-      // Toggle sortType
-      setSortType(!sortType);
-      let keyName =
-        topTabName !== "Exchanges"
-          ? paymentType === 1
-            ? "bankCash"
-            : "bankCard"
-          : "exchangeCash";
+    let keyName =
+      topTabName !== "Exchanges"
+        ? paymentType === 1
+          ? "bankCash"
+          : "bankCard"
+        : "exchangeCash";
 
-      dispatch(sortRateList(rateData, col, sortType, keyName, currency));
-    } else {
+    if (sortColumn !== col) {
       setSortColumn(col);
     }
+    setSortType(!sortType);
+    dispatch(sortRateList(rateData, col, sortType, keyName, currency));
   };
 
   return (
@@ -124,18 +122,18 @@ export default function ExchangeRateList(props: any) {
         />
       </View>
       <View style={styles.rowContainer}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.rowName}
-          onPress={() => sortColumnHandler(0)}
-        >
-          <Text>Name</Text>
-          {sortColumn === 0 && (
+          //onPress={() => sortColumnHandler(0)}
+        > */}
+        <Text style={styles.rowName}>Name</Text>
+        {/* {sortColumn === 0 && (
             <Ionicons
               size={20}
               name={`caret-${sortType ? "up" : "down"}-outline`}
             />
-          )}
-        </TouchableOpacity>
+          )} */}
+        {/* </TouchableOpacity> */}
         <TouchableOpacity
           style={styles.rowCurr}
           onPress={() => sortColumnHandler(1)}
