@@ -1,4 +1,4 @@
-import { FETCH_RATES, RateActionTypes } from "../types/rateTypes";
+import { FETCH_RATES, RateActionTypes, SORT_RATES } from "../types/rateTypes";
 const initialState = {
   bankCash: [
     {
@@ -40,6 +40,11 @@ export const rateReducer = (state = initialState, action: RateActionTypes) => {
         bankCard,
         bankCash,
         exchangeCash,
+      };
+    case SORT_RATES:
+      return {
+        ...state,
+        ...action.payload,
       };
     default:
       return state;

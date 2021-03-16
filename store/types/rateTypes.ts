@@ -29,6 +29,6 @@ interface getRatesAction {
 
 interface sortRatesAction {
   type: typeof SORT_RATES;
-  payload: RateState[];
+  payload: { [key: string]: RateState[] };
 }
 export type RateActionTypes = getRatesAction | sortRatesAction;

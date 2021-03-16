@@ -49,11 +49,26 @@ const fetchRates = (rates: RState): RateActionTypes => {
 export const sortRateList = (
   rates: RateState[],
   col: number,
-  type: boolean
+  type: boolean,
+  keyName: string,
+  cur: string
 ): RateActionTypes => {
+  let sortRates = rates.sort((a: RateState, b: RateState): number => {
+    if (col === 0) {
+      // TODO - assign a large value to undefined distance
+      return type ? a.distance! - b.distance! : b.distance! - a.distance!;
+    } else if (col === 1) {
+      return type ? a[cur].buy - b[cur].buy : b[cur].buy - a[cur].buy;
+    } else {
+      // col === 2
+      return type ? a[cur].sell - b[cur].sell : b[cur].sell - a[cur].sell;
+    }
+  });
+  let sortedRates = { [keyName]: sortRates };
+
   return {
     type: SORT_RATES,
-    payload: rates,
+    payload: sortedRates,
   };
 };
 

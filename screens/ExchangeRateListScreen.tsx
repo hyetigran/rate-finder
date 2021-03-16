@@ -81,7 +81,14 @@ export default function ExchangeRateList(props: any) {
     if (sortColumn == col) {
       // Toggle sortType
       setSortType(!sortType);
-      dispatch(sortRateList(rateData, col, sortType));
+      let keyName =
+        topTabName !== "Exchanges"
+          ? paymentType === 1
+            ? "bankCash"
+            : "bankCard"
+          : "exchangeCash";
+
+      dispatch(sortRateList(rateData, col, sortType, keyName, currency));
     } else {
       setSortColumn(col);
     }
