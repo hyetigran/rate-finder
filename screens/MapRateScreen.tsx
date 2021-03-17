@@ -62,8 +62,8 @@ export default function MapRateScreen(props: {
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
-  const rateData = useSelector((state: RootState) => {
-    return state.rate.card;
+  const allRateData = useSelector((state: RootState) => {
+    return state.rate;
   });
 
   const dispatch = useDispatch();
@@ -90,7 +90,6 @@ export default function MapRateScreen(props: {
 
   const getLocationHandler = async () => {
     const hasPermission = await verifyPermissions();
-
     if (!hasPermission) {
       return;
     }
@@ -121,32 +120,31 @@ export default function MapRateScreen(props: {
     const { isBuy, isCard, currency } = searchForm;
     // Find best rate
     let buying = isBuy ? "buy" : "sell";
-    const bestRate =
+    let rateData = isCard
+      ? allRateData.bankCard
+      : [...allRateData.bankCash, ...allRateData.exchangeCash];
+
+    const sortedRates =
       rateData &&
       rateData
-        .map((bank: RateState) => {
-          let specificRate: number = bank[currency][buying];
-          return { name: bank.bankName, rate: specificRate };
+        .map((establishment: RateState) => {
+          let specificRate: number = establishment[currency][buying];
+
+          return { ...establishment, rate: specificRate };
         })
-        .reduce(
-          (
-            prev: { name: string; rate: number },
-            current: { name: string; rate: number }
-          ) => {
-            if (isBuy) {
-              return prev.rate > current.rate ? prev : current;
-            } else {
-              return prev.rate < current.rate ? prev : current;
-            }
-          },
-          { name: "", rate: 0 }
-        );
-    if (!bestRate) {
+        .sort((a: { rate: number }, b: { rate: number }) => {
+          if (isBuy) {
+            return b.rate - a.rate;
+          } else {
+            return a.rate - b.rate;
+          }
+        });
+    if (!sortedRates) {
       // Handle error if rate list fails to fetch/sort
       return;
     }
     // Call google places API for location
-    fetchMarkers(bestRate, isCard, isBuy);
+    fetchMarkers(sortedRates, isCard, isBuy);
   };
 
   const fetchMarkers = async (
@@ -156,7 +154,6 @@ export default function MapRateScreen(props: {
   ) => {
     let type = isCard ? "atm" : "bank";
     let keyword = bestRate.name;
-
     try {
       let response: any = await axios.get(
         `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${region.latitude},${region.longitude}&radius=1500&type=${type}&keyword=${keyword}&key=${GOOGLE_API_KEY}`
