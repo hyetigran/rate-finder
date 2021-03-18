@@ -165,30 +165,38 @@ export default function MapRateScreen(props: {
             `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${region.latitude},${region.longitude}&radius=1500&type=${type}&keyword=${keyword}&key=${GOOGLE_API_KEY}`
           );
 
-          // .filter((place: any) => {
-          //   // Ensure results contain only keyword passed
-          //   return place.name === keyword;
-          // })
-          let result = response.data.results.map((place: any) => {
-            let id = place.place_id;
-            let name = place.name;
-            let address = place.vicinity;
-            let latitude = place.geometry.location.lat;
-            let longitude = place.geometry.location.lng;
-            let isOpen = place.opening_hours?.open_now || false;
+          let result = response.data.results
+            .filter((place: any) => {
+              // Ensure results contain only keyword passed
+              keyword = keyword.toLowerCase();
+              keyword = keyword.replace("bank", "");
+              keyword = keyword.replace("atm", "");
+              keyword = keyword.trim();
+              keyword = keyword.split(/[\s-]+/)[0];
+              let lowerCaseName = place.name.toLowerCase();
 
-            let marker = {
-              id,
-              name,
-              address,
-              latitude,
-              longitude,
-              isOpen,
-              rate: sortedRates[indexCard].rate,
-              isBuy: isBuy,
-            };
-            return marker;
-          });
+              return lowerCaseName.includes(keyword);
+            })
+            .map((place: any) => {
+              let id = place.place_id;
+              let name = place.name;
+              let address = place.vicinity;
+              let latitude = place.geometry.location.lat;
+              let longitude = place.geometry.location.lng;
+              let isOpen = place.opening_hours?.open_now || false;
+
+              let marker = {
+                id,
+                name,
+                address,
+                latitude,
+                longitude,
+                isOpen,
+                rate: sortedRates[indexCard].rate,
+                isBuy: isBuy,
+              };
+              return marker;
+            });
           results.push(...result);
           indexCard++;
         }
