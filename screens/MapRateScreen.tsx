@@ -12,15 +12,16 @@ import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 import { Ionicons } from "@expo/vector-icons";
 import MapView, { Marker, Callout } from "react-native-maps";
-import { GOOGLE_API_KEY } from "@env";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import { GOOGLE_API_KEY } from "@env";
 import ActionSheet from "../components/ActionSheet";
 import { Text, View } from "../components/Themed";
 import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
 import { thunkGetRates } from "../store/actions/rateActions";
 import { RateState, RootState } from "../store/types/rateTypes";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { addDistancePropertyToExchanges } from "../constants/CalcDistance";
 
 const { width, height } = Dimensions.get("window");
 // Marker pin colors
@@ -148,37 +149,102 @@ export default function MapRateScreen(props: {
   };
 
   const fetchMarkers = async (
-    bestRate: { name: string; rate: number },
+    sortedRates: RateState[],
     isCard: boolean,
     isBuy: boolean
   ) => {
     let type = isCard ? "atm" : "bank";
-    let keyword = bestRate.name;
     try {
-      let response: any = await axios.get(
-        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${region.latitude},${region.longitude}&radius=1500&type=${type}&keyword=${keyword}&key=${GOOGLE_API_KEY}`
-      );
+      let results = [];
+      let keyword = "";
+      if (isCard) {
+        let indexCard = 0;
+        while (results.length < 15) {
+          keyword = sortedRates[indexCard].name;
+          let response: any = await axios.get(
+            `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${region.latitude},${region.longitude}&radius=1500&type=${type}&keyword=${keyword}&key=${GOOGLE_API_KEY}`
+          );
 
-      let results = response.data.results.map((place: any) => {
-        let id = place.place_id;
-        let name = place.name;
-        let address = place.vicinity;
-        let latitude = place.geometry.location.lat;
-        let longitude = place.geometry.location.lng;
-        let isOpen = place.opening_hours?.open_now || false;
+          // .filter((place: any) => {
+          //   // Ensure results contain only keyword passed
+          //   return place.name === keyword;
+          // })
+          let result = response.data.results.map((place: any) => {
+            let id = place.place_id;
+            let name = place.name;
+            let address = place.vicinity;
+            let latitude = place.geometry.location.lat;
+            let longitude = place.geometry.location.lng;
+            let isOpen = place.opening_hours?.open_now || false;
 
-        let marker = {
-          id,
-          name,
-          address,
-          latitude,
-          longitude,
-          isOpen,
-          rate: bestRate.rate,
-          isBuy: isBuy,
-        };
-        return marker;
-      });
+            let marker = {
+              id,
+              name,
+              address,
+              latitude,
+              longitude,
+              isOpen,
+              rate: sortedRates[indexCard].rate,
+              isBuy: isBuy,
+            };
+            return marker;
+          });
+          results.push(...result);
+          indexCard++;
+        }
+      } else {
+        // Handle cash searches
+        let indexCash = 0;
+        // Add distance and coordinate properties to exchange rate
+        let sortedRatesWithDistance = addDistancePropertyToExchanges(
+          sortedRates,
+          { latitude: region.latitude, longitude: region.longitude },
+          true
+        );
+        while (results.length < 15) {
+          if (sortedRatesWithDistance[indexCash].isBank === 0) {
+            // Check distance on exchanges that have distance property and distance is less than 1.4km
+            if (
+              sortedRatesWithDistance[indexCash].distance !== undefined &&
+              sortedRatesWithDistance[indexCash].distance! < 1.4
+            ) {
+              results.push(sortedRatesWithDistance[indexCash]);
+            }
+          } else if (sortedRatesWithDistance[indexCash].isBank === 1) {
+            // fetch markers
+            keyword = sortedRatesWithDistance[indexCash].name;
+            let response: any = await axios.get(
+              `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${region.latitude},${region.longitude}&radius=1500&type=${type}&keyword=${keyword}&key=${GOOGLE_API_KEY}`
+            );
+            // .filter((place: any) => {
+            //   // Ensure results contain only keyword passed
+            //   return place.name === keyword;
+            // })
+            let result = response.data.results.map((place: any) => {
+              let id = place.place_id;
+              let name = place.name;
+              let address = place.vicinity;
+              let latitude = place.geometry.location.lat;
+              let longitude = place.geometry.location.lng;
+              let isOpen = place.opening_hours?.open_now || false;
+
+              let marker = {
+                id,
+                name,
+                address,
+                latitude,
+                longitude,
+                isOpen,
+                rate: sortedRates[indexCash].rate,
+                isBuy: isBuy,
+              };
+              return marker;
+            });
+            results.push(...result);
+          }
+        }
+        indexCash++;
+      }
 
       setMarkers(results);
     } catch (error) {
@@ -189,6 +255,46 @@ export default function MapRateScreen(props: {
       );
     }
   };
+
+  // NOT CURRENTLY INVOKED -- Get Bank markers
+  //   const getFormattedBankMarkers = async(type,sortedRates) => {
+  //     let results = []
+  //     let indexCard = 0;
+  //     let keyword = sortedRates[indexCard].name;
+
+  //     while (results.length < 15) {
+  //       let response: any = await axios.get(
+  //         `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${region.latitude},${region.longitude}&radius=1500&type=${type}&keyword=${keyword}&key=${GOOGLE_API_KEY}`
+  //       );
+
+  //       results = response.data.results
+  //         .filter((place: any) => {
+  //           // Ensure results contain only keyword passed
+  //           return place.name === keyword;
+  //         })
+  //         .map((place: any) => {
+  //           let id = place.place_id;
+  //           let name = place.name;
+  //           let address = place.vicinity;
+  //           let latitude = place.geometry.location.lat;
+  //           let longitude = place.geometry.location.lng;
+  //           let isOpen = place.opening_hours?.open_now || false;
+
+  //           let marker = {
+  //             id,
+  //             name,
+  //             address,
+  //             latitude,
+  //             longitude,
+  //             isOpen,
+  //             rate: sortedRates[indexCard].rate,
+  //             isBuy: isBuy,
+  //           };
+  //           return marker;
+  //         });
+  //       indexCard++;
+  //       return results;
+  // }
 
   // Unecessary to update region state when moving or resizing map
   const changeRegionHandler = (region: Region) => {

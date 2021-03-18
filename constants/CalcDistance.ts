@@ -3,7 +3,8 @@ import { exchangeData } from "./GeoLocation";
 
 export function addDistancePropertyToExchanges(
   data: RateState[],
-  userLocation: { latitude: number; longitude: number }
+  userLocation: { latitude: number; longitude: number },
+  addCoords?: boolean
 ) {
   const { latitude, longitude } = userLocation;
   for (var i in data) {
@@ -11,6 +12,10 @@ export function addDistancePropertyToExchanges(
       if (data[i].name === exchangeData[j].name) {
         let { lat, lng } = exchangeData[j].location;
         data[i]["distance"] = calcDistance(lat, lng, latitude, longitude);
+        if (addCoords) {
+          data[i]["latitude"] = lat;
+          data[i]["longitude"] = lng;
+        }
       }
     }
   }
