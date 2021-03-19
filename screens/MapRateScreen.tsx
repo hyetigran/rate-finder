@@ -273,46 +273,6 @@ export default function MapRateScreen(props: {
     }
   };
 
-  // NOT CURRENTLY INVOKED -- Get Bank markers
-  //   const getFormattedBankMarkers = async(type,sortedRates) => {
-  //     let results = []
-  //     let indexCard = 0;
-  //     let keyword = sortedRates[indexCard].name;
-
-  //     while (results.length < 15) {
-  //       let response: any = await axios.get(
-  //         `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${region.latitude},${region.longitude}&radius=1500&type=${type}&keyword=${keyword}&key=${GOOGLE_API_KEY}`
-  //       );
-
-  //       results = response.data.results
-  //         .filter((place: any) => {
-  //           // Ensure results contain only keyword passed
-  //           return place.name === keyword;
-  //         })
-  //         .map((place: any) => {
-  //           let id = place.place_id;
-  //           let name = place.name;
-  //           let address = place.vicinity;
-  //           let latitude = place.geometry.location.lat;
-  //           let longitude = place.geometry.location.lng;
-  //           let isOpen = place.opening_hours?.open_now || false;
-
-  //           let marker = {
-  //             id,
-  //             name,
-  //             address,
-  //             latitude,
-  //             longitude,
-  //             isOpen,
-  //             rate: sortedRates[indexCard].rate,
-  //             isBuy: isBuy,
-  //           };
-  //           return marker;
-  //         });
-  //       indexCard++;
-  //       return results;
-  // }
-
   // Unecessary to update region state when moving or resizing map
   const changeRegionHandler = (region: Region) => {
     setRegion(region);
