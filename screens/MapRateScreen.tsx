@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import {
-  StyleSheet,
-  Dimensions,
-  Alert,
-  TouchableOpacity,
-  Button,
-} from "react-native";
+import { StyleSheet, Dimensions, Alert, TouchableOpacity } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
@@ -216,6 +210,8 @@ export default function MapRateScreen(props: {
               sortedRatesWithDistance[indexCash].distance !== undefined &&
               sortedRatesWithDistance[indexCash].distance! < 1.4
             ) {
+              // Assign an ID for rendering
+              sortedRatesWithDistance[indexCash]["id"] = indexCash;
               results.push(sortedRatesWithDistance[indexCash]);
             }
           } else if (sortedRatesWithDistance[indexCash].isBank === 1) {
@@ -263,8 +259,8 @@ export default function MapRateScreen(props: {
               });
             results.push(...result);
           }
+          indexCash++;
         }
-        indexCash++;
       }
 
       setMarkers(results);
