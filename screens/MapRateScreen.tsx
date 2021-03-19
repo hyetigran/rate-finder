@@ -224,30 +224,43 @@ export default function MapRateScreen(props: {
             let response: any = await axios.get(
               `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${region.latitude},${region.longitude}&radius=1500&type=${type}&keyword=${keyword}&key=${GOOGLE_API_KEY}`
             );
-            // .filter((place: any) => {
-            //   // Ensure results contain only keyword passed
-            //   return place.name === keyword;
-            // })
-            let result = response.data.results.map((place: any) => {
-              let id = place.place_id;
-              let name = place.name;
-              let address = place.vicinity;
-              let latitude = place.geometry.location.lat;
-              let longitude = place.geometry.location.lng;
-              let isOpen = place.opening_hours?.open_now || false;
 
-              let marker = {
-                id,
-                name,
-                address,
-                latitude,
-                longitude,
-                isOpen,
-                rate: sortedRates[indexCash].rate,
-                isBuy: isBuy,
-              };
-              return marker;
-            });
+            let result = response.data.results
+              .filter((place: any) => {
+                // Ensure results contain only keyword passed
+                keyword = keyword.toLowerCase();
+                keyword = keyword.replace("bank", "");
+                keyword = keyword.replace("atm", "");
+                keyword = keyword.trim();
+                keyword = keyword.split(/[\s-]+/)[0];
+                let lowerCaseName = place.name.toLowerCase();
+
+                // Filter out place with ATM in name for "Cash" searches
+                return (
+                  lowerCaseName.includes(keyword) &&
+                  !lowerCaseName.includes("atm")
+                );
+              })
+              .map((place: any) => {
+                let id = place.place_id;
+                let name = place.name;
+                let address = place.vicinity;
+                let latitude = place.geometry.location.lat;
+                let longitude = place.geometry.location.lng;
+                let isOpen = place.opening_hours?.open_now || false;
+
+                let marker = {
+                  id,
+                  name,
+                  address,
+                  latitude,
+                  longitude,
+                  isOpen,
+                  rate: sortedRates[indexCash].rate,
+                  isBuy: isBuy,
+                };
+                return marker;
+              });
             results.push(...result);
           }
         }

@@ -53,7 +53,6 @@ export default function ExchangeRateList(props: any) {
       }
     }
   });
-  //console.log("rateD", rateData[0]);
   const dispatch = useDispatch();
 
   useEffect(() => {
