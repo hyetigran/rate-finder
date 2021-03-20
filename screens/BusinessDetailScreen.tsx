@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { StyleSheet, ScrollView } from "react-native";
+import { StyleSheet, ScrollView, Image, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+
 // @ts-ignore
 import { GOOGLE_API_KEY } from "@env";
 
-import EditScreenInfo from "../components/EditScreenInfo";
 import { Text, View } from "../components/Themed";
+// @ts-ignore
+import { defaultBankImage } from "../assets/images";
+import Colors from "../constants/Colors";
 
 interface ActionProps {
   route: { params: { placeId: string } };
@@ -19,6 +23,7 @@ interface BusinessDetail {
   isOpen: boolean;
   hours: string[];
 }
+const primaryBlue = Colors.light.primary;
 
 export default function BusinessDetailScreen(props: ActionProps) {
   const [businessDetail, setBusinessDetail] = useState<BusinessDetail>();
@@ -52,7 +57,7 @@ export default function BusinessDetailScreen(props: ActionProps) {
         address: formatted_address,
         phoneNumber: international_phone_number,
         rating: rating,
-        reviewCount: reviews.length,
+        reviewCount: reviews.length ? reviews.length : 0,
         isOpen: opening_hours.open_now,
         hours: opening_hours.weekday_text,
         imageURI: photoResponse?.request?.responseURL
@@ -66,13 +71,25 @@ export default function BusinessDetailScreen(props: ActionProps) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
-      <View
-        style={styles.separator}
-        lightColor="#eee"
-        darkColor="rgba(255,255,255,0.1)"
-      />
-      <EditScreenInfo path="/screens/BusinessDetailScreen.tsx" />
+      <Image source={defaultBankImage} />
+      <View>
+        <Text>5.0 star, star, star (2 reviews)</Text>
+      </View>
+      <View style={styles.rowDetail}>
+        <Ionicons color={primaryBlue} size={30} name="location-outline" />
+        <Text>address</Text>
+      </View>
+      <View style={styles.rowDetail}>
+        <Ionicons color={primaryBlue} size={30} name="call-outline" />
+        <Text>phone</Text>
+      </View>
+      <View style={styles.rowDetail}>
+        <Ionicons color={primaryBlue} size={30} name="time-outline" />
+        <Text>is open</Text>
+        <TouchableOpacity>
+          <Ionicons color={primaryBlue} size={24} name="chevron-down-outline" />
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 }
@@ -91,5 +108,14 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     height: 1,
     width: "80%",
+  },
+  rowDetail: {
+    flexDirection: "row",
+    width: "100%",
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    alignItems: "center",
+    borderColor: "rgba(0,0,0,0.2)",
+    borderBottomWidth: 1,
   },
 });
