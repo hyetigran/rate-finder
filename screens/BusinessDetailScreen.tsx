@@ -10,20 +10,55 @@ import { Text, View } from "../components/Themed";
 interface ActionProps {
   route: { params: { placeId: string } };
 }
+interface BusinessDetail {
+  address: string;
+  phoneNumber: string;
+  rating: number;
+  reviewCount: number;
+  imageURI: string;
+  isOpen: boolean;
+  hours: string[];
+}
 
 export default function BusinessDetailScreen(props: ActionProps) {
-  const [businessDetail, setBusinessDetail] = useState();
+  const [businessDetail, setBusinessDetail] = useState<BusinessDetail>();
   const placeId = props.route.params.placeId;
 
   useEffect(() => {
     fetchBusinessDetails(placeId);
-  });
+  }, []);
   const fetchBusinessDetails = async (placeId: string) => {
-    // AXIOS CALL to GOOGLE API
+    // AXIOS CALL to GOOGLE PLACE & PHOTO API
     try {
-      const result = await axios.get(
+      const response: any = await axios.get(
         `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${GOOGLE_API_KEY}`
       );
+      const {
+        formatted_address,
+        international_phone_number,
+        opening_hours,
+        photos,
+        reviews,
+        rating,
+      } = response.data.result;
+      let photoResponse: any = "";
+      if (photos && photos.length) {
+        let photoRef = photos[0].photo_reference;
+        photoResponse = await axios.get(
+          `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoRef}&key=${GOOGLE_API_KEY}`
+        );
+      }
+      setBusinessDetail({
+        address: formatted_address,
+        phoneNumber: international_phone_number,
+        rating: rating,
+        reviewCount: reviews.length,
+        isOpen: opening_hours.open_now,
+        hours: opening_hours.weekday_text,
+        imageURI: photoResponse?.request?.responseURL
+          ? photoResponse.request.responseURL
+          : "",
+      });
     } catch (error) {
       console.log(error);
     }
