@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet } from "react-native";
+import axios from "axios";
+import { StyleSheet, ScrollView } from "react-native";
+// @ts-ignore
+import { GOOGLE_API_KEY } from "@env";
 
 import EditScreenInfo from "../components/EditScreenInfo";
 import { Text, View } from "../components/Themed";
@@ -15,12 +18,19 @@ export default function BusinessDetailScreen(props: ActionProps) {
   useEffect(() => {
     fetchBusinessDetails(placeId);
   });
-  const fetchBusinessDetails = (placeId: string) => {
+  const fetchBusinessDetails = async (placeId: string) => {
     // AXIOS CALL to GOOGLE API
+    try {
+      const result = await axios.get(
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${GOOGLE_API_KEY}`
+      );
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Tab Two</Text>
       <View
         style={styles.separator}
@@ -28,7 +38,7 @@ export default function BusinessDetailScreen(props: ActionProps) {
         darkColor="rgba(255,255,255,0.1)"
       />
       <EditScreenInfo path="/screens/BusinessDetailScreen.tsx" />
-    </View>
+    </ScrollView>
   );
 }
 
