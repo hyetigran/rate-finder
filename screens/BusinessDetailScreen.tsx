@@ -168,7 +168,11 @@ export default function BusinessDetailScreen(props: ActionProps) {
     </View>
   );
 }
-
+export const screenOptions = (navData) => {
+  return {
+    headerTitle: navData.route.params.titleName,
+  };
+};
 const styles = StyleSheet.create({
   screenContainer: { flex: 1 },
   container: {

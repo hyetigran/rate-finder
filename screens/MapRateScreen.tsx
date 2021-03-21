@@ -303,11 +303,12 @@ export default function MapRateScreen(props: {
                 pinColor={PRIMARY_RATE_COLOR}
                 tracksViewChanges={false}
                 // onPress={pinPressHandler}
-                onCalloutPress={() =>
+                onCalloutPress={() => {
                   props.navigation.navigate("BusinessDetailScreen", {
                     placeId: marker.id,
-                  })
-                }
+                    titleName: marker.name,
+                  });
+                }}
               >
                 <Callout>
                   <View>
