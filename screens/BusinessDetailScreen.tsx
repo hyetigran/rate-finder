@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
+  StatusBar,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -16,6 +17,7 @@ import { Text, View } from "../components/Themed";
 // @ts-ignore
 import { defaultBankImage } from "../assets/images";
 import Colors from "../constants/Colors";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface ActionProps {
   route: { params: { placeId: string } };
@@ -72,11 +74,12 @@ export default function BusinessDetailScreen(props: ActionProps) {
           `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoRef}&key=${GOOGLE_API_KEY}`
         );
       }
+
       setBusinessDetail({
         address: formatted_address,
         phoneNumber: international_phone_number,
-        rating: rating,
-        reviewCount: reviews.length ? reviews.length : 0,
+        rating: rating ? rating : "No rating",
+        reviewCount: reviews?.length ? reviews.length : 0,
         isOpen: opening_hours.open_now,
         hours: opening_hours.weekday_text,
         imageURI: photoResponse?.request?.responseURL
@@ -116,68 +119,61 @@ export default function BusinessDetailScreen(props: ActionProps) {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {!loadingUI ? (
-        imageURI ? (
-          <Image source={{ uri: imageURI }} style={styles.mainImage} />
+    <View style={styles.screenContainer}>
+      <ScrollView contentContainerStyle={styles.container}>
+        {!loadingUI ? (
+          imageURI ? (
+            <Image source={{ uri: imageURI }} style={styles.mainImage} />
+          ) : (
+            <Image source={defaultBankImage} style={styles.mainImage} />
+          )
         ) : (
-          <Image source={defaultBankImage} style={styles.mainImage} />
-        )
-      ) : (
-        <ActivityIndicator size="large" color={primaryBlue} />
-      )}
-      <View style={styles.ratingContainer}>
-        <Text>{rating}</Text>
-        {stars.map((star, index) => (
-          <Ionicons key={index} color={primaryBlue} size={14} name={star} />
-        ))}
-        <Text>{`(${reviewCount} reviews)`}</Text>
-      </View>
-      <View style={styles.rowDetail}>
-        <Ionicons color={primaryBlue} size={30} name="location-outline" />
-        <Text>{address}</Text>
-      </View>
-      <View style={styles.rowDetail}>
-        <Ionicons color={primaryBlue} size={30} name="call-outline" />
-        <Text>{phoneNumber}</Text>
-      </View>
-      <View style={styles.rowDetail}>
-        <Ionicons color={primaryBlue} size={30} name="time-outline" />
-        <Text>{isOpen ? "Open" : "Closed"}</Text>
-        <TouchableOpacity onPress={() => setShowHours(!showHours)}>
-          <Ionicons
-            color={primaryBlue}
-            size={24}
-            name={`chevron-${showHours ? "up" : "down"}-outline`}
-          />
-        </TouchableOpacity>
-      </View>
-      {showHours &&
-        hours.map((hour) => {
-          return (
-            <View key={hour} style={styles.rowDetail}>
-              <Text style={styles.hourText}>{hour}</Text>
-            </View>
-          );
-        })}
-    </ScrollView>
+          <ActivityIndicator size="large" color={primaryBlue} />
+        )}
+        <View style={styles.ratingContainer}>
+          <Text>{`${rating} `}</Text>
+          {stars.map((star, index) => (
+            <Ionicons key={index} color={primaryBlue} size={14} name={star} />
+          ))}
+          <Text>{` (${reviewCount} reviews)`}</Text>
+        </View>
+        <View style={styles.rowDetail}>
+          <Ionicons color={primaryBlue} size={30} name="location-outline" />
+          <Text style={styles.textInfo}>{address}</Text>
+        </View>
+        <View style={styles.rowDetail}>
+          <Ionicons color={primaryBlue} size={30} name="call-outline" />
+          <Text style={styles.textInfo}>{phoneNumber}</Text>
+        </View>
+        <View style={styles.rowDetail}>
+          <Ionicons color={primaryBlue} size={30} name="time-outline" />
+          <Text style={styles.textInfo}>{isOpen ? "Open" : "Closed"}</Text>
+          <TouchableOpacity onPress={() => setShowHours(!showHours)}>
+            <Ionicons
+              color={primaryBlue}
+              size={24}
+              name={`chevron-${showHours ? "up" : "down"}-outline`}
+            />
+          </TouchableOpacity>
+        </View>
+        {showHours &&
+          hours.map((hour) => {
+            return (
+              <View key={hour} style={styles.rowDetail}>
+                <Text style={styles.hourText}>{hour}</Text>
+              </View>
+            );
+          })}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  screenContainer: { flex: 1 },
   container: {
-    flex: 1,
-    alignItems: "center",
-    //justifyContent: "center",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: "80%",
+    flexGrow: 1,
+    justifyContent: "flex-start",
   },
   rowDetail: {
     flexDirection: "row",
@@ -188,13 +184,22 @@ const styles = StyleSheet.create({
     borderColor: "rgba(0,0,0,0.2)",
     borderBottomWidth: 1,
   },
-  hourText: { marginLeft: 30 },
+  textInfo: {
+    paddingLeft: 10,
+  },
+  hourText: { marginLeft: 40 },
   mainImage: {
     width: "100%",
     maxHeight: 200,
+    minHeight: 200,
     flex: 1,
   },
   ratingContainer: {
     flexDirection: "row",
+    width: "100%",
+    justifyContent: "center",
+    borderColor: "rgba(0,0,0,0.2)",
+    borderBottomWidth: 1,
+    paddingVertical: 10,
   },
 });
