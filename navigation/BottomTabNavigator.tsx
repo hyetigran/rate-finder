@@ -7,7 +7,9 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
 import MapRateScreen from "../screens/MapRateScreen";
-import BusinessDetailScreen from "../screens/BusinessDetailScreen";
+import BusinessDetailScreen, {
+  screenOptions as businessDetailScreenOptions,
+} from "../screens/BusinessDetailScreen";
 import { BottomTabParamList, TabOneParamList, TabTwoParamList } from "../types";
 import ExchangeRateList from "../screens/ExchangeRateListScreen";
 
@@ -67,8 +69,7 @@ function TabOneNavigator() {
       <TabOneStack.Screen
         name="BusinessDetailScreen"
         component={BusinessDetailScreen}
-        // Refactor options to the component screen to dynamicall add biz name as header Title
-        options={{ headerTitle: "Detail Screen" }}
+        options={businessDetailScreenOptions}
       />
     </TabOneStack.Navigator>
   );
