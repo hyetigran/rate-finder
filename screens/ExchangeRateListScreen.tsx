@@ -27,6 +27,7 @@ export default function ExchangeRateList(props: any) {
     latitude: 0,
     longitude: 0,
   });
+
   const [currency, setCurrency] = useState("USD");
   const [paymentType, setPaymentType] = useState(initialPaymentType);
   const [sortColumn, setSortColumn] = useState(-1); // initial (not set) -1, 0 distance, 1 buy, 2 sell
@@ -35,6 +36,7 @@ export default function ExchangeRateList(props: any) {
   const rateData: RateState[] = useSelector((state: RootState) => {
     if (topTabName === "Exchanges") {
       let exchangeData = state.rate.exchangeCash;
+
       // Check default location has been over-ridden
       if (userLocation.latitude && userLocation.longitude) {
         let enhExchangeCash: RateState[] = addDistancePropertyToExchanges(
@@ -67,7 +69,9 @@ export default function ExchangeRateList(props: any) {
   const getUserLocation = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem("userLocation");
-      return jsonValue != null ? JSON.parse(jsonValue) : null;
+      return jsonValue != null
+        ? JSON.parse(jsonValue)
+        : { latitude: 0, longitude: 0 };
     } catch (error) {
       // Handle user location not previously stored/saved
       console.log(error);
