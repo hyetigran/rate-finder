@@ -295,6 +295,7 @@ export default function MapRateScreen(props: {
           markers!.map((marker) => {
             return (
               <Marker
+                pointerEvents={"auto"}
                 key={marker.id}
                 coordinate={{
                   latitude: marker.latitude,

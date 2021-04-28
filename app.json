@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "rn-map",
-    "slug": "rn-map",
+    "name": "rate-map",
+    "slug": "rate-map",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -19,7 +19,9 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.rate-map.rate-map",
+      "buildNumber": "0.0.1"
     },
     "android": {
       "adaptiveIcon": {
